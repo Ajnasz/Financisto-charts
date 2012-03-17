@@ -10,7 +10,7 @@ function generateSession() {
         date: Date.now(),
         data: {}
     };
-    console.log('create session', sessions);
+    console.log('create session');
     return sessionId;
 }
 
