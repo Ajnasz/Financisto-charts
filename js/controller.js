@@ -39,7 +39,7 @@ Controller.prototype.notFound = function () {
 };
 Controller.prototype.readFile = function (file, cb) {
     console.log('read file', file);
-    fs.readFile(file, function (err, data) {
+    fs.readFile('../' + file, function (err, data) {
         if (err) {
             this.notFound();
         } else {
