@@ -17,10 +17,10 @@ var yuiConf = {
             requires: ['attribute', 'console', 'ajn:dao']
         },
         'ajn:dao': {
-            fullpath: './js/ajndao.js'
+            fullpath: __dirname + '/js/ajndao.js'
         },
         'console': {
-            fullpath: './js/console.js'
+            fullpath: __dirname + '/js/console.js'
         }
     }
 };
