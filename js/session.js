@@ -43,7 +43,7 @@ function createSession(req, res, sessionCookieName) {
 }
 
 function invalidateSession(sessionId) {
-    console.log('invalidat sessoin', sessionId);
+    console.log('invalidate sessoin', sessionId);
 
     if (sessions[sessionId]) {
         sessions[sessionId] = null;
@@ -98,7 +98,6 @@ Session.prototype.invalidate = function () {
 
 setInterval(function () {
     var minLastAccess = Date.now() - sessionLifeTime;
-    console.log('call session invalidator', Object.keys(sessions));
     Object.keys(sessions).forEach(function (sessionId) {
         if (sessions[sessionId].date < minLastAccess) {
             invalidateSession(sessionId);
