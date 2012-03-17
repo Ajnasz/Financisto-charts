@@ -143,7 +143,7 @@ function processRequest(req, res) {
 
 setInterval(function () {
     console.log('memory usage: ', process.memoryUsage());
-}, 10000);
+}, 600000);
 
 http.createServer(processRequest).listen(15799, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:15799/');
