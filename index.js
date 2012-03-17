@@ -13,14 +13,14 @@ var http = require('http'),
 var yuiConf = {
     modules: {
         'ajn': {
-            fullpath: 'js/fw.js',
+            fullpath: './js/fw.js',
             requires: ['attribute', 'console', 'ajn:dao']
         },
         'ajn:dao': {
-            fullpath: 'js/ajndao.js'
+            fullpath: './js/ajndao.js'
         },
         'console': {
-            fullpath: 'js/console.js'
+            fullpath: './js/console.js'
         }
     }
 };
