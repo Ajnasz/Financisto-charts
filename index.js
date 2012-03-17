@@ -13,7 +13,7 @@ var http = require('http'),
 var yuiConf = {
     modules: {
         'ajn': {
-            fullpath: __dirname + './js/fw.js',
+            fullpath: __dirname + '/js/fw.js',
             requires: ['attribute', 'console', 'ajn:dao']
         },
         'ajn:dao': {
