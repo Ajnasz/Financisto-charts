@@ -5,8 +5,8 @@ var http = require('http'),
     url = require('url'),
     queryString = require('querystring'),
     YUI = require('yui3').YUI,
-    Session = require('js/session').Session,
-    Controller = require('js/controller').Controller;
+    Session = require('./js/session').Session,
+    Controller = require('./js/controller').Controller;
 
 
 
@@ -99,7 +99,7 @@ function processRequest(req, res) {
                 output = {success: true};
             } catch (er) {
                 try {
-                    backupParser = require('js/backupparser').backupParser;
+                    backupParser = require('./js/backupparser').backupParser;
                     requestData = backupParser(requestData);
                     session.setData('data', JSON.stringify(requestData));
                     output = {success: true};

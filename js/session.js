@@ -32,7 +32,7 @@ function createSession(req, res, sessionCookieName) {
     var sessionId = cookie.getCookie(req, sessionCookieName);
     if (!sessionId) {
         console.log('session cookie not foound');
-        
+
         sessionId = generateSession();
     } else {
         console.log('session cookie foound', sessionId);
