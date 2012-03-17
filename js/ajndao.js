@@ -14,17 +14,18 @@ YUI.add('ajn:dao', function (Y) {
                 aData = allData[a],
                 bData = allData[b],
                 output = [];
-
-            aData.forEach(function (aItem) {
-                bData.forEach(function (bItem) {
-                    if (aItem[on.aField] === bItem[on.bField]) {
-                        var merged = Y.merge(aItem, bItem);
-                        merged[a + on.aField + '_joined_'] = aItem[on.aField];
-                        merged[b + on.bField + '_joined_'] = bItem[on.bField];
-                        output.push(merged);
-                    }
+            if (aData && aData.length) {
+                aData.forEach(function (aItem) {
+                    bData.forEach(function (bItem) {
+                        if (aItem[on.aField] === bItem[on.bField]) {
+                            var merged = Y.merge(aItem, bItem);
+                            merged[a + on.aField + '_joined_'] = aItem[on.aField];
+                            merged[b + on.bField + '_joined_'] = bItem[on.bField];
+                            output.push(merged);
+                        }
+                    });
                 });
-            });
+            }
             return output;
         },
         getAll: function () {
