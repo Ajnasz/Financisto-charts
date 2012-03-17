@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <title>Index</title>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.4.1/build/cssbase/cssbase-min.css">
+  <script src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+  <script src="/a.js"></script>
+  <style type="text/css">
+    .chart {
+      height: 600px;
+      position: relative;
+      width: 80%;
+    }
+    #controls {
+      margin: 1em 0;
+    }
+    #controls li {
+        float: left;
+        list-style: none;
+    }
+    #controls:after {
+        clear:both;
+        content: '.';
+        display:block;
+        height:0;
+        visibility: hidden;
+    }
+    .transactionTooltip {
+        background-color: #333;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 13px;
+    }
+    .transactionTooltip > ul {
+        margin: 0;
+        padding: 0;
+    }
+    .transactionTooltip li {
+        font-family: sans-serif;
+        list-style: none;
+    }
+    #controls button {
+        border: #ccc;
+        background: transparent;
+        color: #000;
+        cursor:pointer;
+    }
+    #controls button:first-letter {
+        text-transform: uppercase;
+    }
+    #controls button.hidden {
+        color: #666;
+    }
+    textarea {
+        width: 400px;
+        height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>E!</h1>
+  <h2 id="error"></h2>
+  <div id="charts">
+    <h2>All transactions</h3>
+    <div id="mychart" class="chart"></div>
+    <div id="controls"></div>
+    <h2>Transactions in last 31 days</h3>
+    <div id="transactions" class="chart"></div>
+  </div>
+  <div id="dataForm">
+    <h2>Set the data</h2>
+    <form action="/setdata" method="post" id="dataPoster">
+      <textarea name="data" value="" id=""></textarea><br />
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</body>
+</html>
