@@ -7,7 +7,6 @@ function Controller(req, res) {
     this.res = res;
 }
 Controller.prototype.sendResponse = function (resp) {
-    
     if (resp.status) {
         this.res.statusCode = resp.status;
     }
@@ -39,6 +38,7 @@ Controller.prototype.notFound = function () {
     });
 };
 Controller.prototype.readFile = function (file, cb) {
+    console.log('read file', file);
     fs.readFile(file, function (err, data) {
         if (err) {
             this.notFound();
