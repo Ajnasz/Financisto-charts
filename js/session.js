@@ -84,8 +84,6 @@ Session.prototype.setData = function (name, value) {
     this.sessionId = updateSession(this.sessionId);
     if (this.checkDataSize(value)) {
         setData(this.sessionId, name, value);
-        console.log('after set', getData(this.sessionId, name));
-        
     } else {
         throw new RangeError('Can\'t set data, limit exceeded. ');
     }
