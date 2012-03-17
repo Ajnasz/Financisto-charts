@@ -73,19 +73,19 @@ function processRequest(req, res) {
     req.on('end', function () {
         switch (requestUrl.pathname) {
         case '/':
-            controller.serveFile('templates/index.html');
+            controller.serveFile('./templates/index.html');
             break;
         case '/a.js':
-            controller.serveFile('js/a.js', 'text/javascript');
+            controller.serveFile('./js/a.js', 'text/javascript');
             break;
         case '/console.js':
-            controller.serveFile('js/console.js', 'text/javascript');
+            controller.serveFile('./js/console.js', 'text/javascript');
             break;
         case '/fw.js':
-            controller.serveFile('js/fw.js', 'text/javascript');
+            controller.serveFile('./js/fw.js', 'text/javascript');
             break;
         case '/ajndao.js':
-            controller.serveFile('js/ajndao.js', 'text/javascript');
+            controller.serveFile('./js/ajndao.js', 'text/javascript');
             break;
         case '/setdata':
             requestData = queryString.parse(requestData).data;
