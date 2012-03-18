@@ -48,11 +48,6 @@ function getTransactions(data, requestUrl, cb) {
     });
 }
 
-function callController(req) {
-    var requestUrl = url.parse(req.url, true),
-        f;
-}
-
 function processRequest(req, res) {
     var controller = new Controller(req, res),
         requestUrl = url.parse(req.url, true),
@@ -91,27 +86,25 @@ function processRequest(req, res) {
             requestData = queryString.parse(requestData).data;
             var status = null,
                 output = {success: false},
+                PostDataParser = require(__dirname + '/js/parseData.js').PostDataParser,
+                postDataParser = new PostDataParser(),
                 backupParser,
                 data;
-            try {
-                JSON.parse(requestData);
-                session.setData('data', requestData);
-                output = {success: true};
-            } catch (er) {
-                try {
-                    backupParser = require('./js/backupparser').backupParser;
-                    requestData = backupParser(requestData);
-                    session.setData('data', JSON.stringify(requestData));
-                    output = {success: true};
-                } catch (er2) {
-                    output = {
-                        success: false,
-                        message: er2.message
-                    };
-                    status = 400;
-                }
-            }
-            controller.serveJSON(JSON.stringify(output), status);
+            postDataParser.setData(requestData);
+            postDataParser.on('error', function (er) {
+                console.log('on error', er.message);
+                controller.serveJSON(JSON.stringify({
+                    success: false,
+                    message: er.message
+                }), 400);
+            });
+            postDataParser.on('data', function (data) {
+                session.setData('data', data);
+                controller.serveJSON(JSON.stringify({
+                    success: true
+                }));
+            });
+            postDataParser.parse();
             break;
         case '/a.json':
             d = session.getData('data');

@@ -18,13 +18,14 @@ function backupParser(data) {
             row = null;
             currentTable = null;
         } else if (currentTable) {
-            match = line.match(/^([\-a-zA-Z_]+):([\-_.\w\d\s]+)$/);
+            match = line.split(':');
             if (!row) {
                 row = {};
             }
-            row[match[1]] = match[2];
+            // I don't know what are the allowed chars for a name
+            row[match[0]] = match.slice(1).join(':');
         } else {
-            console.error('no table selected');
+            // console.error('no table selected');
         }
     });
     return tables;
