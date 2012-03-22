@@ -9,18 +9,25 @@ YUI.add('ajn:dao', function (Y) {
         });
     }
     AjnDao.prototype = {
-        join: function (a, b, on) {
+        join: function (aData, bData, on, names) {
             var allData = this.get('json'),
-                aData = allData[a],
-                bData = allData[b],
                 output = [];
+            names = Y.merge({
+                aNames: {},
+                bNames: {}
+            }, names);
             if (aData && aData.length) {
                 aData.forEach(function (aItem) {
                     bData.forEach(function (bItem) {
                         if (aItem[on.aField] === bItem[on.bField]) {
-                            var merged = Y.merge(aItem, bItem);
-                            merged[a + on.aField + '_joined_'] = aItem[on.aField];
-                            merged[b + on.bField + '_joined_'] = bItem[on.bField];
+                            // var merged = Y.merge(aItem, bItem);
+                            var merged = {};
+                            Object.keys(names.aNames).forEach(function (key) {
+                                merged[names.aNames[key]] = aItem[key];
+                            });
+                            Object.keys(names.bNames).forEach(function (key) {
+                                merged[names.bNames[key]] = bItem[key];
+                            });
                             output.push(merged);
                         }
                     });

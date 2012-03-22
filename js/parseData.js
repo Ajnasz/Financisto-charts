@@ -16,7 +16,43 @@ function tryThese() {
 }
 function PostDataParser() {}
 util.inherits(PostDataParser, EventEmitter);
+PostDataParser.prototype.downloadFile = function (url) {
+    console.log('download file', url);
+    
+    url = require('url').parse(url);
+    var req = require('http').request({
+        host: url.host,
+        port: url.port,
+        path: url.path,
+        method: 'GET'
+    }, function (res) {
+        var data = [],
+            data_len = 0;
+        if (res.statusCode === 200) {
+            // res.setEncoding('binary');
+            res.on('data', function (chunk) {
+                data.push(chunk);
+                data_len += chunk.length;
+            });
+            res.on('end', function () {
+                var fs = require('fs'),
+                    buf = new Buffer(data_len);
+                for (a = 0, p = 0; p < data_len; p += data[a++].length) {
+                    data[a].copy(buf, p, 0);
+                }
+                this.parseData(buf);
+            }.bind(this));
+        } else {
+            this.emit('error', new Error("Can't download the file!"));
+        }
+    }.bind(this));
+    req.on('error', function (er) {
+        this.emit('error', er);
+    }.bind(this));
+    req.end();
+};
 PostDataParser.prototype.parseJSON = function (data, cb) {
+    console.log('call on parse json');
     var output;
     try {
         data = JSON.parse(data);
@@ -28,6 +64,7 @@ PostDataParser.prototype.parseJSON = function (data, cb) {
     cb(output);
 };
 PostDataParser.prototype.parseUnzippedBackup = function (data, cb) {
+    console.log('call on parse unzipped backup');
     try {
         var backupParser = require(dir + '/backupparser').backupParser;
         data = backupParser(data);
@@ -37,27 +74,30 @@ PostDataParser.prototype.parseUnzippedBackup = function (data, cb) {
     }
 };
 PostDataParser.prototype.parseZippedBackup = function (data, cb) {
-    var gzip = require(dir + '/gzip.js').gzip,
+    console.log('call on parse zipped backup');
+    var gunzip = require(dir + '/gzip.js').gunzip,
         output = [],
         output_len = 0;
 
-    gzip(data, function (code, data) {
+    gunzip(data, function (code, data) {
         if (code === 0) {
+            console.log('unzip success');
             this.parseUnzippedBackup(data.toString('utf8'), cb);
         } else {
             cb(new Error('Gzip exited with code ' + code));
         }
     }.bind(this));
 };
-PostDataParser.prototype.parse = function () {
-    var data = this.data,
-        output;
+
+PostDataParser.prototype.parseData = function (data) {
+    var output;
     tryThese(
         function () {
             this.parseJSON(data, function (result) {
                 if (result instanceof Error) {
                     throw result;
                 } else {
+                    console.log('json parsed');
                     this.emit('data', result);
                     this.emit('end', result);
                 }
@@ -68,6 +108,7 @@ PostDataParser.prototype.parse = function () {
                 if (result instanceof Error) {
                     throw result;
                 } else {
+                    console.log('unzipped parsed');
                     this.emit('data', result);
                     this.emit('end', result);
                 }
@@ -85,7 +126,16 @@ PostDataParser.prototype.parse = function () {
         }.bind(this)
     );
 };
-PostDataParser.prototype.setData = function (data) {
-    this.data = data;
+PostDataParser.prototype.parse = function () {
+    if (this.query.data.trim()) {
+        this.parseData(this.query.data);
+    } else if (this.query.url.trim()) {
+        this.downloadFile(this.query.url.trim());
+    } else {
+        this.emit('error', new TypeError("Can't get data"));
+    }
+};
+PostDataParser.prototype.setData = function (query) {
+    this.query = query;
 };
 exports.PostDataParser = PostDataParser;

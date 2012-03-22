@@ -34,7 +34,7 @@ Controller.prototype.notFound = function () {
         headers: [
             {name: 'Content-Type', value: 'text/html'}
         ],
-        data: 'Not found'
+        data: 'AAA Not found'
     });
 };
 Controller.prototype.readFile = function (file, cb) {

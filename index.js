@@ -6,7 +6,8 @@ var http = require('http'),
     queryString = require('querystring'),
     YUI = require('yui3').YUI,
     Session = require('ajn-session').Session,
-    Controller = require('./js/controller').Controller;
+    Controller = require('./js/controller').Controller,
+    Router = require('./libs/Router').Router;
 
 
 
@@ -30,12 +31,67 @@ function getTransactions(data, requestUrl, cb) {
         var output = '',
             days = requestUrl.query.days || null,
             date,
+            allData,
             ajn;
 
         ajn = new Y.Ajn(data);
-        output = ajn.dao.join('transactions', 'payee', {
-            aField: 'payee_id',
+        allData = ajn.dao.get('json');
+        output = ajn.dao.join(
+            allData.transactions,
+            allData.payee,
+            {
+                aField: 'payee_id',
+                bField: '_id'
+            },
+            {
+                aNames: {
+                    '_id': 'transaction_id',
+                    'from_amount': 'transaction_amount',
+                    'from_account_id': 'transaction_account_id',
+                    'datetime': 'datetime'
+                },
+                bNames: {
+                    '_id': 'payee_id',
+                    'title': 'payee_title'
+                }
+            }
+        );
+        output = ajn.dao.join(
+            output,
+            allData.account,
+            {
+                aField: 'transaction_account_id',
+                bField: '_id'
+            },
+            {
+                aNames: {
+                    'transaction_id': 'transaction_id',
+                    'transaction_amount': 'transaction_amount',
+                    'datetime': 'datetime',
+                    'payee_title': 'payee_title'
+                },
+                bNames: {
+                    title: 'account_title',
+                    'currency_id': 'currency_id'
+                }
+            }
+        );
+        output = ajn.dao.join(output, allData.currency, {
+            aField: 'currency_id',
             bField: '_id'
+        }, {
+            aNames: {
+                'transaction_id': 'transaction_id',
+                'transaction_amount': 'transaction_amount',
+                'datetime': 'datetime',
+                'payee_title': 'payee_title',
+                'account_title': 'account_title'
+            },
+            bNames: {
+                'name': 'currency_name',
+                'symbol': 'currency_symbol',
+                title: 'currency_title'
+            }
         });
         if (days) {
             date = new Date();
@@ -48,12 +104,38 @@ function getTransactions(data, requestUrl, cb) {
     });
 }
 
+function getController(action) {
+    var actionArr = action.split('/'),
+        Controller,
+        controller;
+    try {
+        Controller = require('actions/' + actionArr.slice(0, -1))[actionArr.slice(-2, -1)];
+        controller = new Controller();
+    } catch (err) {
+        console.log('cant get controller', err, action);
+    }
+    return controller;
+}
+
+var router = new Router();
+router.addRoute('/', 'GET', 'Static/Index');
+router.addRoute('/a.js', 'GET', 'Static/JS');
+router.addRoute('/console.js', 'GET', 'Static/JS');
+router.addRoute('/fw.js', 'GET', 'Static/JS');
+router.addRoute('/ajndao.js', 'GET', 'Static/JS');
+router.addRoute('/data', 'GET', 'Data/Get');
+router.addRoute('/data', 'PUT', 'Data/Set');
+router.addRoute('/data', 'DELETE', 'Data/Del');
+router.addRoute('/a.json', 'GET', 'Data/Get');
+router.addRoute('/transactions.json', 'GET', 'Transactions/Get');
 function processRequest(req, res) {
-    var controller = new Controller(req, res),
+    var server = new Controller(req, res),
         requestUrl = url.parse(req.url, true),
         requestData = '',
         session,
         d;
+
+    console.log('process request');
     session = new Session(req, res);
 
     req.setEncoding('utf8');
@@ -62,74 +144,52 @@ function processRequest(req, res) {
         requestData += chunk;
     });
     req.on('error', function (err) {
-        controller.serverError();
+        server.serverError();
         console.log(err);
     });
     req.on('end', function () {
-        switch (requestUrl.pathname) {
-        case '/':
-            controller.serveFile('./templates/index.html');
-            break;
-        case '/a.js':
-            controller.serveFile('./js/a.js', 'text/javascript');
-            break;
-        case '/console.js':
-            controller.serveFile('./js/console.js', 'text/javascript');
-            break;
-        case '/fw.js':
-            controller.serveFile('./js/fw.js', 'text/javascript');
-            break;
-        case '/ajndao.js':
-            controller.serveFile('./js/ajndao.js', 'text/javascript');
-            break;
-        case '/setdata':
-            requestData = queryString.parse(requestData).data;
-            var status = null,
-                output = {success: false},
-                PostDataParser = require(__dirname + '/js/parseData.js').PostDataParser,
-                postDataParser = new PostDataParser(),
-                backupParser,
-                data;
-            postDataParser.setData(requestData);
-            postDataParser.on('error', function (er) {
-                console.log('on error', er.message);
-                controller.serveJSON(JSON.stringify({
-                    success: false,
-                    message: er.message
-                }), 400);
+        console.log('on request end');
+        var route = router.getRoute(requestUrl.pathname, req.method),
+            controller;
+
+        if (route) {
+            controller = getController(route);
+        }
+
+        if (controller) {
+            controller.setConf({
+                jsdir: __dirname + '/js',
+                templateDir: __dirname + '/templates'
             });
-            postDataParser.on('data', function (data) {
-                session.setData('data', data);
-                controller.serveJSON(JSON.stringify({
-                    success: true
-                }));
+            controller.on('error', function (code) {
+                if (code === 404) {
+                    server.notFound();
+                } else {
+                    server.serverError();
+                }
             });
-            postDataParser.parse();
-            break;
-        case '/a.json':
-            d = session.getData('data');
-            if (d) {
-                controller.serveJSON(d);
-            } else {
-                controller.notFound(d);
-            }
-            break;
-        case '/transactions.json':
-            d = session.getData('data');
-            if (d) {
-                // data = session.getData(sessionId, 'data')
-                getTransactions(JSON.parse(d), requestUrl, function (data) {
-                    controller.serveJSON(JSON.stringify(data));
+            controller.on('setHeaders', function (headers) {
+                server.sendResponse({
+                    headers: headers
                 });
-            } else {
-                controller.notFound(d);
-            }
-            break;
+            });
+            controller.on('dataDone', function (data) {
+                console.log('send response');
+                server.sendResponse(data);
+            });
+            controller.init({
+                session: session
+            });
+            console.log('request data');
+            controller.callAction(route, req, queryString.parse(requestData));
+        } else {
+            console.log('router not found');
+            server.notFound();
         }
         requestData = '';
     });
     req.on('close', function () {
-        controller = null;
+        server = null;
     });
 
 }
