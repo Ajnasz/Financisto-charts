@@ -109,7 +109,7 @@ function getController(action) {
         Controller,
         controller;
     try {
-        Controller = require('actions/' + actionArr.slice(0, -1))[actionArr.slice(-2, -1)];
+        Controller = require(__dirname + '/actions/' + actionArr.slice(0, -1))[actionArr.slice(-2, -1)];
         controller = new Controller();
     } catch (err) {
         console.log('cant get controller', err, action);
