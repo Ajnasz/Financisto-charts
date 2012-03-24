@@ -32,6 +32,30 @@ Router.prototype = {
             output = this.routes[path][method];
         }
         return output;
+    },
+    put: function (path, action) {
+        this.addRoute(path, 'PUT', action);
+    },
+    post: function (path, action) {
+        this.addRoute(path, 'POST', action);
+    },
+    get: function (path, action) {
+        this.addRoute(path, 'GET', action);
+    },
+    del: function (path, action) {
+        this.addRoute(path, 'DELETE', action);
+    },
+    head: function (path, action) {
+        this.addRoute(path, 'HEAD', action);
+    },
+    trace: function (path, action) {
+        this.addRoute(path, 'TRACE', action);
+    },
+    connect: function (path, action) {
+        this.addRoute(path, 'CONNECT', action);
+    },
+    options: function (path, action) {
+        this.addRoute(path, 'OPTIONS', action);
     }
 };
 exports.Router = Router;

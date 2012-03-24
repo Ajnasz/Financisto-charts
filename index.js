@@ -118,16 +118,16 @@ function getController(action) {
 }
 
 var router = new Router();
-router.addRoute('/', 'GET', 'Static/Index');
-router.addRoute('/a.js', 'GET', 'Static/JS');
-router.addRoute('/console.js', 'GET', 'Static/JS');
-router.addRoute('/fw.js', 'GET', 'Static/JS');
-router.addRoute('/ajndao.js', 'GET', 'Static/JS');
-router.addRoute('/data', 'GET', 'Data/Get');
-router.addRoute('/data', 'PUT', 'Data/Set');
-router.addRoute('/data', 'DELETE', 'Data/Del');
-router.addRoute('/a.json', 'GET', 'Data/Get');
-router.addRoute('/transactions.json', 'GET', 'Transactions/Get');
+router.get('/', 'Static/Index');
+router.get('/a.js', 'Static/JS');
+router.get('/console.js', 'Static/JS');
+router.get('/fw.js', 'Static/JS');
+router.get('/ajndao.js', 'Static/JS');
+router.get('/data', 'Data/Get');
+router.put('/data', 'Data/Set');
+router.del('/data', 'Data/Del');
+router.get('/a.json', 'Data/Get');
+router.get('/transactions.json', 'Transactions/Get');
 function processRequest(req, res) {
     var server = new Controller(req, res),
         requestUrl = url.parse(req.url, true),
