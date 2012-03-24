@@ -307,7 +307,9 @@ YUI({
     function getAll() {
         load('#dataPoster');
         Y.io('/data', {
-            'method': 'GET',
+            data: {
+                d: Date.now()
+            },
             'on': {
                 'success': function (id, o, args) {
                     noLoad('#dataPoster');
