@@ -2,11 +2,10 @@
 var util = require('util'),
     url = require('url'),
     Action = require('../libs/Action').Action;
-function Data() {
-}
-
+function Data() {}
 util.inherits(Data, Action);
 Data.prototype.executeGet = function () {
+    this.noClientCache();
     var data = this.session.getData('data');
     if (data) {
         this.serveJSON(JSON.stringify(JSON.parse(data).tables), 200);

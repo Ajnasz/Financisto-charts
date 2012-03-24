@@ -20,6 +20,9 @@ Action.prototype.callAction = function (action, request, requestData) {
 Action.prototype.sendResponse = function (resp) {
     this.emit('dataDone', resp);
 };
+Action.prototype.noClientCache = function () {
+    this.setHeaders([{name: 'Cache-Control', value: 'no-cache'}]);
+};
 Action.prototype.serverError = function () {
     this.sendResponse({
         status: 500,
@@ -38,12 +41,15 @@ Action.prototype.notFound = function () {
         data: 'Not found'
     });
 };
+Action.prototype.setHeaders = function (headers) {
+    this.emit('setHeaders', headers);
+};
 Action.prototype.setContentHeaders = function (data, type) {
     var headers = [
         {name: 'Content-Type', value: type || 'text/html'},
         {name: 'Content-Length', value: Buffer.byteLength(data)}
     ];
-    this.emit('setHeaders', headers);
+    this.setHeaders(headers);
 };
 Action.prototype.serveFile = function (file, type, status) {
     this.readFile(file, function (data) {
