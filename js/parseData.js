@@ -75,17 +75,16 @@ PostDataParser.prototype.parseUnzippedBackup = function (data, cb) {
 };
 PostDataParser.prototype.parseZippedBackup = function (data, cb) {
     console.log('call on parse zipped backup');
-    var gunzip = require(dir + '/gzip.js').gunzip,
+    var gunzip = require('zlib').gunzip,
         output = [],
         output_len = 0;
 
-    gunzip(data, function (code, data) {
-        if (code === 0) {
-            console.log('unzip success');
-            this.parseUnzippedBackup(data.toString('utf8'), cb);
-        } else {
-            cb(new Error('Gzip exited with code ' + code));
+    gunzip(data, function (err, data) {
+        if (err) {
+            throw err;
         }
+        console.log('unzip success');
+        this.parseUnzippedBackup(data.toString('utf8'), cb);
     }.bind(this));
 };
 
