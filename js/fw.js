@@ -58,10 +58,7 @@ YUI.add('ajn', function (Y) {
             json.transactions.forEach(function (transaction) {
                     var from_change,
                     to_change,
-                    amountId,
-                    dateStr,
-                    ob,
-                    change;
+                    dateStr;
                 date.setTime(transaction.datetime);
                 dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
                 from_change = transaction.from_amount / 100;
@@ -93,10 +90,8 @@ YUI.add('ajn', function (Y) {
                 var from_change,
                     title = data.accounts[transaction.from_account_id].title,
                     to_change,
-                    amountId,
                     dateStr,
-                    ob,
-                    change;
+                    ob;
                 date.setTime(transaction.datetime);
                 dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
                 from_change = transaction.from_amount / 100;
@@ -118,8 +113,6 @@ YUI.add('ajn', function (Y) {
                     // ob[data.accounts[account].title] = amounts[data.accounts[account].title];
                 });
             });
-            console.log(dates);
-            
             return Object.keys(dates).map(function (item) {
                 var ob = dates[item];
                 ob.date = item;

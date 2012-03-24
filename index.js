@@ -106,10 +106,12 @@ function getTransactions(data, requestUrl, cb) {
 
 function getController(action) {
     var actionArr = action.split('/'),
+        actionName = actionArr.slice(0, -1),
+        dir = __dirname,
         Controller,
         controller;
     try {
-        Controller = require(__dirname + '/actions/' + actionArr.slice(0, -1))[actionArr.slice(-2, -1)];
+        Controller = require(dir + '/actions/' + actionName)[actionArr.slice(-2, -1)];
         controller = new Controller();
     } catch (err) {
         console.log('cant get controller', err, action);
@@ -135,7 +137,7 @@ function processRequest(req, res) {
         session,
         d;
 
-    console.log('process request');
+    console.log('process request', req.url, req.method);
     session = new Session(req, res);
 
     req.setEncoding('utf8');

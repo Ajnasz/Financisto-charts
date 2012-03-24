@@ -167,8 +167,6 @@ YUI({
             min = transaction.total < min ? transaction.total : min;
             max = transaction.total > max ? transaction.total : max;
         });
-        console.log(min, max);
-        
         totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
         totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
         
