@@ -13,12 +13,13 @@ var http = require('http'),
 
 var yuiConf = {
     modules: {
-        'ajn': {
-            fullpath: __dirname + '/js/fw.js',
-            requires: ['attribute', 'console', 'ajn:dao']
+        'FinancistoApp': {
+            fullpath: __dirname + '/js/FinancistoApp.js',
+            requires: ['base', 'charts', 'io', 'node', 'event', 'tabview',
+                'console', 'DataProvider', 'attribute']
         },
-        'ajn:dao': {
-            fullpath: __dirname + '/js/ajndao.js'
+        'DataProvider': {
+            fullpath: __dirname + '/js/DataProvider.js'
         },
         'console': {
             fullpath: __dirname + '/js/console.js'
@@ -123,7 +124,7 @@ var router = new Router();
 router.get('/', 'Static/Index');
 router.get('/a.js', 'Static/JS');
 router.get('/console.js', 'Static/JS');
-router.get('/fw.js', 'Static/JS');
+router.get('/FinancistoApp.js', 'Static/JS');
 router.get('/ajndao.js', 'Static/JS');
 router.get('/data', 'Data/Get');
 router.put('/data', 'Data/Set');

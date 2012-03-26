@@ -37,12 +37,13 @@ util.inherits(Transactions, Action);
 Transactions.prototype.executeGet = function (request, requestData) {
     var allData = JSON.parse(this.session.getData('data')).tables,
         days = null,
+        date,
         output;
 
     if (requestData && requestData.query && requestData.query.days) {
         days =  requestData.query.days;
     }
-    
+
     if (allData) {
         output = join(
             allData.transactions,

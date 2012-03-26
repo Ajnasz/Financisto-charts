@@ -24,6 +24,8 @@ Static.prototype.executeJS = function (request) {
         fileName = 'fw.js';
     } else if (pathName === '/ajndao.js') {
         fileName = 'ajndao.js';
+    } else if (pathName === '/FinancistoApp.js') {
+        fileName = 'FinancistoApp.js';
     }
 
     this.readJSFile(fileName, function (data) {
