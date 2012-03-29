@@ -10,7 +10,7 @@ Data.prototype.executeGet = function () {
     if (data) {
         this.serveJSON(JSON.stringify(JSON.parse(data).tables), 200);
     } else {
-        this.notFound();
+        this.sendResponse({status: 204});
     }
 };
 Data.prototype.executeSet = function (req, requestData) {

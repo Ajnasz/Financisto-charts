@@ -9,6 +9,11 @@ function Controller(req, res) {
 Controller.prototype.sendResponse = function (resp) {
     if (resp.status) {
         this.res.statusCode = resp.status;
+        switch (resp.status) {
+        case 204:
+            this.res.end();
+            return;
+        }
     }
     if (resp.headers) {
         resp.headers.forEach(function (header) {

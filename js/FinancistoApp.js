@@ -143,6 +143,18 @@ YUI.add('FinancistoApp', function (Y) {
             fields: fields
         };
     }
+    function onFailure(id, o, args) {
+        var msg = null, response;
+        try {
+            console.log(o.status);
+            response = JSON.parse(o.response);
+            msg = response.message;
+            this.badData(msg);
+        } catch (er) {
+            this.serverError();
+        }
+        this.noLoad('#dataPoster');
+    }
 
     function FinancistoApp() {
         this.addAttrs({
@@ -165,6 +177,7 @@ YUI.add('FinancistoApp', function (Y) {
                 setter: processTransactions
             }
         });
+
         Y.one('#dataPoster').on('submit', function (e) {
             e.preventDefault();
             load('#dataPoster');
@@ -180,10 +193,7 @@ YUI.add('FinancistoApp', function (Y) {
                         this.goodData();
                         this.getAll();
                     }.bind(this),
-                    failure: function () {
-                        this.noLoad('#dataPoster');
-                        this.badData();
-                    }
+                    failure: onFailure.bind(this)
                 }
             });
         }.bind(this));
@@ -201,7 +211,7 @@ YUI.add('FinancistoApp', function (Y) {
                     success: function () {
                         this.hideCharts();
                     }.bind(this),
-                    failure: function () {
+                    failure: function (response) {
                         this.badData();
                     }.bind(this)
                 }
@@ -446,9 +456,10 @@ YUI.add('FinancistoApp', function (Y) {
                 this.totalChart.destroy();
             }
         },
-        badData: function badData() {
+        badData: function badData(msg) {
             this.hideCharts();
-            Y.one('#error').setContent('Bad data').show();
+            msg = msg || 'Bad data';
+            Y.one('#error').setContent(msg).show();
         },
         goodData: function goodData() {
             this.showCharts();
@@ -479,25 +490,22 @@ YUI.add('FinancistoApp', function (Y) {
                 'on': {
                     'success': function (id, o, args) {
                         this.noLoad('#dataPoster');
-                        var json = JSON.parse(o.response);
-                        if (json.account) {
-                            this.set('json', json);
-                            this.set('processedAllTransactions');
-                            this.getTransactions();
-                            this.goodData();
-                            this.onAllResponse(json);
-                        } else {
+                        if (o.status === 200) {
+                            var json = JSON.parse(o.response);
+                            if (json.account) {
+                                this.set('json', json);
+                                this.set('processedAllTransactions');
+                                this.getTransactions();
+                                this.goodData();
+                                this.onAllResponse(json);
+                            } else {
+                                this.badData();
+                            }
+                        } else if (o.status === 204) {
                             this.badData();
                         }
                     }.bind(this),
-                    'failure': function (id, o, args) {
-                        this.noLoad('#dataPoster');
-                        if (o.status === 404) {
-                            this.badData();
-                        } else {
-                            this.serverError();
-                        }
-                    }.bind(this)
+                    'failure': onFailure.bind(this)
                 }
             });
         }

@@ -177,7 +177,6 @@ function processRequest(req, res) {
                 });
             });
             controller.on('dataDone', function (data) {
-                console.log('send response');
                 server.sendResponse(data);
             });
             controller.init({
