@@ -4,14 +4,37 @@ var util = require('util'),
     Action = require('../libs/Action').Action;
 function Static() {}
 util.inherits(Static, Action);
+Static.prototype.serveStatic = function (request, data, type, status) {
+    var noContent = false,
+        contentType = 'text/html';
+    if (request.method === 'HEAD') {
+        noContent = true;
+    }
+    switch (type) {
+    case 'html':
+        contentType = 'text/html';
+        break;
+    case 'js':
+        contentType = 'text/javascript';
+        break;
+    case 'css':
+        contentType = 'text/css';
+        break;
+    case 'json':
+        contentType = 'application/json';
+        break;
+    }
+    this.setContentHeaders(data, contentType);
+    this.sendResponse({
+        status: status,
+        data: data,
+        noContent: noContent
+    });
+};
 Static.prototype.executeIndex = function (request) {
     this.readTemplateFile('index.html', function (data) {
         var dataStr = data.toString('utf8');
-        if (request.method === 'HEAD') {
-            this.serveHTML(dataStr, false, true);
-        } else {
-            this.serveHTML(dataStr);
-        }
+        this.serveStatic(request, dataStr, 'html');
     }.bind(this));
 };
 
@@ -34,7 +57,7 @@ Static.prototype.executeJS = function (request) {
 
     this.readJSFile(fileName, function (data) {
         var dataStr = data.toString('utf8');
-        this.serveJS(dataStr);
+        this.serveStatic(request, dataStr, 'js');
     }.bind(this));
 };
 
@@ -49,7 +72,7 @@ Static.prototype.executeCSS = function (request) {
 
     this.readCSSFile(fileName, function (data) {
         var dataStr = data.toString('utf8');
-        this.serveCSS(dataStr);
+        this.serveStatic(request, dataStr, 'css');
     }.bind(this));
 };
 
