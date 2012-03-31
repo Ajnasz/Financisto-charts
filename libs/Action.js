@@ -83,12 +83,23 @@ Action.prototype.serveJS = function (data, status) {
         data: data
     });
 };
+Action.prototype.serveCSS = function (data, status) {
+    this.setContentHeaders(data, 'text/css');
+    this.sendResponse({
+        status: status || 200,
+        data: data
+    });
+};
 Action.prototype.setConf = function setConf(conf) {
-    this.jsDir = conf.jsdir;
+    this.jsDir = conf.jsDir;
+    this.cssDir = conf.cssDir;
     this.templateDir = conf.templateDir;
 };
 Action.prototype.readJSFile = function readJSFile(file, cb) {
     return this.readFile(this.jsDir + '/' + file, cb);
+};
+Action.prototype.readCSSFile = function readCSSFile(file, cb) {
+    return this.readFile(this.cssDir + '/' + file, cb);
 };
 Action.prototype.readTemplateFile = function readTemplateFile(file, cb) {
     return this.readFile(this.templateDir + '/' + file, cb);

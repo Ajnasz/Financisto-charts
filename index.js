@@ -125,6 +125,7 @@ router.get('/', 'Static/Index');
 router.get('/a.js', 'Static/JS');
 router.get('/console.js', 'Static/JS');
 router.get('/FinancistoApp.js', 'Static/JS');
+router.get('/styles.css', 'Static/CSS');
 router.get('/ajndao.js', 'Static/JS');
 router.get('/data', 'Data/Get');
 router.put('/data', 'Data/Set');
@@ -161,7 +162,8 @@ function processRequest(req, res) {
 
         if (controller) {
             controller.setConf({
-                jsdir: __dirname + '/js',
+                jsDir: __dirname + '/js',
+                cssDir: __dirname + '/css',
                 templateDir: __dirname + '/templates'
             });
             controller.on('error', function (code) {

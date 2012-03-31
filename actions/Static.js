@@ -34,4 +34,19 @@ Static.prototype.executeJS = function (request) {
     }.bind(this));
 };
 
+Static.prototype.executeCSS = function (request) {
+    var requestUrl = url.parse(request.url, true),
+        pathName = requestUrl.pathname,
+        fileName;
+
+    if (pathName === '/styles.css') {
+        fileName = 'styles.css';
+    }
+
+    this.readCSSFile(fileName, function (data) {
+        var dataStr = data.toString('utf8');
+        this.serveCSS(dataStr);
+    }.bind(this));
+};
+
 exports.Static = Static;
