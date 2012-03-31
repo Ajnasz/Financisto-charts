@@ -15,6 +15,16 @@ YUI({
             fullpath: '/console.js'
         }
     }
-}).use('FinancistoApp', function (Y) {
-    var app = new Y.FinancistoApp();
+}).use('node', 'FinancistoApp', function (Y) {
+    window.Y = Y;
+    Y.one('#Main').setStyle('display', 'block');
+    if (typeof Object.keys !== 'function' || typeof Array.prototype.forEach !== 'function') {
+        Y.all('#DataForm,#Charts').hide();
+        Y.one('#Error').setContent('Your browser is not supported. ' +
+            '<a href="http://affiliates.mozilla.org/link/banner/3935">Please upgrade</a>' +
+            ' to use a better web.')
+            .get('parentNode').setStyle('display', 'block');
+    } else {
+        var app = new Y.FinancistoApp();
+    }
 });
