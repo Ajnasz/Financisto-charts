@@ -122,6 +122,7 @@ function getController(action) {
 
 var router = new Router();
 router.get('/', 'Static/Index');
+router.head('/', 'Static/Index');
 router.get('/a.js', 'Static/JS');
 router.get('/console.js', 'Static/JS');
 router.get('/FinancistoApp.js', 'Static/JS');

@@ -11,8 +11,8 @@ Controller.prototype.sendResponse = function (resp) {
         this.res.statusCode = resp.status;
         switch (resp.status) {
         case 204:
-            this.res.end();
-            return;
+            resp.noContent = true;
+            break;
         }
     }
     if (resp.headers) {
@@ -20,7 +20,9 @@ Controller.prototype.sendResponse = function (resp) {
             this.res.setHeader(header.name, header.value);
         }.bind(this));
     }
-    if (resp.data) {
+    if (resp.noContent) {
+        this.res.end();
+    } else if (resp.data) {
         this.res.end(resp.data);
     }
 };
@@ -68,11 +70,12 @@ Controller.prototype.serveJSON = function (data, status) {
         data: typeof data === 'object' ? JSON.stringify(data) : data
     });
 };
-Controller.prototype.serveHTML = function (data, status) {
+Controller.prototype.serveHTML = function (data, status, noContent) {
     this.setContentHeaders(data, 'text/html');
     this.sendResponse({
         status: status || 200,
-        data: data
+        data: data,
+        noContent: noContent
     });
 };
 Controller.prototype.serveFile = function (file, type, status) {

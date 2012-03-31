@@ -7,7 +7,11 @@ util.inherits(Static, Action);
 Static.prototype.executeIndex = function (request) {
     this.readTemplateFile('index.html', function (data) {
         var dataStr = data.toString('utf8');
-        this.serveHTML(dataStr);
+        if (request.method === 'HEAD') {
+            this.serveHTML(dataStr, false, true);
+        } else {
+            this.serveHTML(dataStr);
+        }
     }.bind(this));
 };
 

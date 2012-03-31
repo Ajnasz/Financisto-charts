@@ -62,11 +62,12 @@ Action.prototype.serveFile = function (file, type, status) {
         });
     }.bind(this));
 };
-Action.prototype.serveHTML = function (data, status) {
+Action.prototype.serveHTML = function (data, status, noContent) {
     this.setContentHeaders(data, 'text/html');
     this.sendResponse({
         status: status || 200,
-        data: data
+        data: data,
+        noContent: noContent
     });
 };
 Action.prototype.serveJSON = function (data, status) {
