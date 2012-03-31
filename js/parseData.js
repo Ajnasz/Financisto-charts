@@ -17,8 +17,6 @@ function tryThese() {
 function PostDataParser() {}
 util.inherits(PostDataParser, EventEmitter);
 PostDataParser.prototype.downloadFile = function (url) {
-    console.log('download file', url);
-    
     url = require('url').parse(url);
     var req = require('http').request({
         host: url.host,
@@ -52,7 +50,6 @@ PostDataParser.prototype.downloadFile = function (url) {
     req.end();
 };
 PostDataParser.prototype.parseJSON = function (data, cb) {
-    console.log('call on parse json');
     var output;
     try {
         data = JSON.parse(data);
@@ -64,9 +61,11 @@ PostDataParser.prototype.parseJSON = function (data, cb) {
     cb(output);
 };
 PostDataParser.prototype.parseUnzippedBackup = function (data, cb) {
-    console.log('call on parse unzipped backup');
     try {
         var backupParser = require(dir + '/backupparser').backupParser;
+        if (Buffer.isBuffer(data)) {
+            data = data.toString('utf8');
+        }
         data = backupParser(data);
         this.parseJSON(JSON.stringify(data), cb);
     } catch (unzippedParseError) {
@@ -74,7 +73,6 @@ PostDataParser.prototype.parseUnzippedBackup = function (data, cb) {
     }
 };
 PostDataParser.prototype.parseZippedBackup = function (data, cb) {
-    console.log('call on parse zipped backup');
     var gunzip = require('zlib').gunzip,
         output = [],
         output_len = 0;
@@ -83,7 +81,6 @@ PostDataParser.prototype.parseZippedBackup = function (data, cb) {
         if (err) {
             throw err;
         }
-        console.log('unzip success');
         this.parseUnzippedBackup(data.toString('utf8'), cb);
     }.bind(this));
 };
@@ -96,7 +93,6 @@ PostDataParser.prototype.parseData = function (data) {
                 if (result instanceof Error) {
                     throw result;
                 } else {
-                    console.log('json parsed');
                     this.emit('data', result);
                     this.emit('end', result);
                 }
@@ -107,7 +103,6 @@ PostDataParser.prototype.parseData = function (data) {
                 if (result instanceof Error) {
                     throw result;
                 } else {
-                    console.log('unzipped parsed');
                     this.emit('data', result);
                     this.emit('end', result);
                 }
