@@ -152,7 +152,6 @@ function processRequest(req, res) {
         console.log(err);
     });
     req.on('end', function () {
-        console.log('on request end');
         var route = router.getRoute(requestUrl.pathname, req.method),
             controller;
 
@@ -184,7 +183,6 @@ function processRequest(req, res) {
             controller.init({
                 session: session
             });
-            console.log('request data');
             controller.callAction(route, req, queryString.parse(requestData));
         } else {
             console.log('router not found');
