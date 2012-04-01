@@ -159,7 +159,8 @@ function processRequest(req, res) {
         session,
         d;
 
-    console.log('process request', req.url, req.method);
+    console.log('%s\t%s\t%s\t%s\t%s', (new Date()).toISOString(), req.method, req.url,
+                req.headers['user-agent'], req.headers.referer || '');
     session = new Session(req, res);
 
     req.setEncoding('utf8');
