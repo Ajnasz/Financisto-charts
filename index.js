@@ -7,7 +7,9 @@ var http = require('http'),
     YUI = require('yui3').YUI,
     Session = require('ajn-session').Session,
     Controller = require('./libs/Controller').Controller,
-    Router = require('./libs/Router').Router;
+    Router = require('./libs/Router').Router,
+    ip = '127.0.0.1',
+    port = 16444;
 
 
 
@@ -26,6 +28,18 @@ var yuiConf = {
         }
     }
 };
+
+function showMemoryUsage() {
+    var stat, rssInKB, heapTotalInKB, heapUsedInKB;
+
+    stat = process.memoryUsage();
+    rssInKB = stat.rss / 1024;
+    heapTotalInKB = stat.heapTotal / 1024;
+    heapUsedInKB = stat.heapUsed / 1024;
+
+    console.log('memory usage: rss: %d KB, heap total: %d KB, heap used: %d KB',
+                rssInKB, heapTotalInKB, heapUsedInKB);
+}
 
 function getTransactions(data, requestUrl, cb) {
     YUI(yuiConf).use('ajn', function (Y) {
@@ -202,10 +216,9 @@ function processRequest(req, res) {
 
 }
 
-setInterval(function () {
-    console.log('memory usage: ', process.memoryUsage());
-}, 600000);
+setInterval(showMemoryUsage, 600000);
 
 
-http.createServer(processRequest).listen(16444, '127.0.0.1');
-console.log('Server running at http://127.0.0.1:16444/');
+http.createServer(processRequest).listen(port, ip);
+console.log('Server running at http://%s:%d', ip, port);
+showMemoryUsage();
