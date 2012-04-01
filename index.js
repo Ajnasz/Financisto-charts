@@ -6,7 +6,7 @@ var http = require('http'),
     queryString = require('querystring'),
     YUI = require('yui3').YUI,
     Session = require('ajn-session').Session,
-    Controller = require('./js/controller').Controller,
+    Controller = require('./libs/Controller').Controller,
     Router = require('./libs/Router').Router;
 
 
