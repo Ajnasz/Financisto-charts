@@ -89,28 +89,33 @@ YUI.add('FinancistoApp', function (Y) {
             amounts[data.accounts[account._id].title] = 0;
         });
 
+        json.transactions.sort(function (a, b) {
+            return a.datetime - b.datetime;
+        });
+
         json.transactions.forEach(function (transaction) {
             var from_change,
                 title = data.accounts[transaction.from_account_id].title,
-                to_change,
+                to_change = 0,
+                change = 0,
                 dateStr,
                 ob;
             date.setTime(transaction.datetime);
             dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
             from_change = transaction.from_amount / 100;
-            amounts[title] += from_change;
-            total += from_change;
             if (transaction.to_account_id && data.accounts[transaction.to_account_id]) {
                 to_change = transaction.to_amount / 100;
-                amounts[title] += to_change;
-                total += to_change;
             }
-
+            change = (from_change + to_change);
+            amounts[title] += change;
+            total += change;
             if (!dates[dateStr]) {
                 dates[dateStr] = {
+                    change: 0,
                     data: {}
                 };
             }
+            dates[dateStr].change = (from_change + to_change);
             Object.keys(data.accounts).forEach(function (account) {
                 var title = data.accounts[account].title;
                 if (!dates[dateStr].data[title]) {
