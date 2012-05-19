@@ -1,6 +1,7 @@
 /*jslint node: true*/
 var util = require('util'),
     url = require('url'),
+    queryString = require('querystring'),
     Action = require('../libs/Action').Action;
 
 function join(aData, bData, on, names) {
@@ -37,11 +38,12 @@ util.inherits(Transactions, Action);
 Transactions.prototype.executeGet = function (request, requestData) {
     var allData = JSON.parse(this.session.getData('data')).tables,
         days = null,
+        query = url.parse(request.url, true).query,
         date,
         output;
 
-    if (requestData && requestData.query && requestData.query.days) {
-        days =  requestData.query.days;
+    if (query && query.days) {
+        days =  query.days;
     }
 
     if (allData) {
@@ -103,10 +105,9 @@ Transactions.prototype.executeGet = function (request, requestData) {
             }
         });
         if (days) {
-            date = new Date();
-            date.setDate(date.getDate() - days);
+            date = Date.now() - 60 * 60 * 24 * 1000 * days;
             output = output.filter(function (item) {
-                return date.getTime() <= item.datetime;
+                return date <= item.datetime;
             });
         }
 
