@@ -188,33 +188,43 @@ YUI.add('FinancistoApp', function (Y) {
         json.transactions.forEach(function (transaction) {
             var from_change,
                 title = data.accounts[transaction.from_account_id].title,
+                totitle = null,
                 to_change = 0,
                 change = 0,
                 dateStr,
                 ob;
+
             date.setTime(transaction.datetime);
             dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
             from_change = transaction.from_amount / 100;
             if (transaction.to_account_id && data.accounts[transaction.to_account_id]) {
                 to_change = transaction.to_amount / 100;
+                totitle = data.accounts[transaction.to_account_id].title;
+                amounts[totitle] += to_change;
             }
+
             change = (from_change + to_change);
-            amounts[title] += change;
+            amounts[title] += from_change;
             total += change;
+
             if (!dates[dateStr]) {
                 dates[dateStr] = {
                     change: 0,
                     data: {}
                 };
             }
-            dates[dateStr].change = (from_change + to_change);
+
+            dates[dateStr].change = change;
+
             Object.keys(data.accounts).forEach(function (account) {
                 var title = data.accounts[account].title;
                 if (!dates[dateStr].data[title]) {
                     dates[dateStr].data[title] = 0;
                 }
+
                 dates[dateStr].data[title] = amounts[title];
             });
+
             dates[dateStr].total = total;
         });
 
@@ -525,6 +535,7 @@ YUI.add('FinancistoApp', function (Y) {
         onTransactionsResponse: function onTransactionsResponse(id, o, args) {
             this.noLoad('#DataPoster');
             this.set('processedTransactions', o.response);
+
             var transactions, trn, fields, dates;
 
             trn = [];
