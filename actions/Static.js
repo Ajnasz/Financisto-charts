@@ -53,6 +53,8 @@ Static.prototype.executeJS = function (request) {
         fileName = 'ajndao.js';
     } else if (pathName === '/FinancistoApp.js') {
         fileName = 'FinancistoApp.js';
+    } else if (pathName === '/dataconverter.js') {
+        fileName = 'dataconverter.js';
     }
 
     this.readJSFile(fileName, function (data) {

@@ -46,6 +46,8 @@ Transactions.prototype.executeGet = function (request, requestData) {
         days =  query.days;
     }
 
+    require('fs').writeFile('alldata.json', JSON.stringify(allData), 'utf-8');
+
     if (allData) {
         output = join(
             allData.transactions,

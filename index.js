@@ -69,6 +69,8 @@ router.get('/styles.css', 'Static/CSS');
 router.head('/styles.css', 'Static/CSS');
 router.get('/ajndao.js', 'Static/JS');
 router.head('/ajndao.js', 'Static/JS');
+router.get('/dataconverter.js', 'Static/JS');
+router.head('/dataconverter.js', 'Static/JS');
 router.get('/data', 'Data/Get');
 router.put('/data', 'Data/Set');
 router.del('/data', 'Data/Del');

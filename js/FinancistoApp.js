@@ -11,92 +11,83 @@ YUI.add('node++', function (Y) {
 }, {requires: ['node']});
 
 YUI.add('FinancistoApp', function (Y) {
-(function () {
-    var setAreaData = function()
-    {
-        var isNumber = Y.Lang.isNumber,
-            nextX, nextY,
-            graph = this.get("graph"),
-            w = graph.get("width"),
-            h = graph.get("height"),
-            xAxis = this.get("xAxis"),
-            yAxis = this.get("yAxis"),
-            xData = this.get("xData").concat(),
-            yData = this.get("yData").concat(),
-            xValue,
-            yValue,
-            xOffset = xAxis.getEdgeOffset(xData.length, w),
-            yOffset = yAxis.getEdgeOffset(yData.length, h),
-            padding = this.get("styles").padding,
-            leftPadding = padding.left,
-            topPadding = padding.top,
-            dataWidth = w - (leftPadding + padding.right + xOffset),
-            dataHeight = h - (topPadding + padding.bottom + yOffset),
-            xcoords = [],
-            ycoords = [],
-            xMax = xAxis.get("maximum"),
-            xMin = xAxis.get("minimum"),
-            yMax = yAxis.get("maximum"),
-            yMin = yAxis.get("minimum"),
-            xScaleFactor = dataWidth / (xMax - xMin),
-            yScaleFactor = dataHeight / (yMax - yMin),
-            dataLength,
-            direction = this.get("direction"),
-            i = 0,
-            xMarkerPlane = [],
-            yMarkerPlane = [],
-            xMarkerPlaneOffset = this.get("xMarkerPlaneOffset"),
-            yMarkerPlaneOffset = this.get("yMarkerPlaneOffset"),
-            graphic = this.get("graphic");
-        graphic.set("width", w);
-        graphic.set("height", h);
-        dataLength = xData.length;
-        xOffset *= 0.5;
-        yOffset *= 0.5;
-        //Assuming a vertical graph has a range/category for its vertical axis.
-        if(direction === "vertical")
-        {
-            yData = yData.reverse();
-        }
-        this._leftOrigin = Math.round(((0 - xMin) * xScaleFactor) + leftPadding + xOffset);
-        this._bottomOrigin = Math.round((dataHeight + topPadding + yOffset));
-        if(yMin < 0)
-        {
-            this._bottomOrigin = this._bottomOrigin - ((0 - yMin) * yScaleFactor);
-        }
-        for (; i < dataLength; ++i)
-        {
-            xValue = parseFloat(xData[i]);
-            yValue = parseFloat(yData[i]);
-            if(isNumber(xValue))
-            {
-                nextX = (((xValue - xMin) * xScaleFactor) + leftPadding + xOffset);
+    (function () {
+        var setAreaData = function () {
+            var isNumber = Y.Lang.isNumber,
+                nextX,
+                nextY,
+                graph = this.get("graph"),
+                w = graph.get("width"),
+                h = graph.get("height"),
+                xAxis = this.get("xAxis"),
+                yAxis = this.get("yAxis"),
+                xData = this.get("xData").concat(),
+                yData = this.get("yData").concat(),
+                xValue,
+                yValue,
+                xOffset = xAxis.getEdgeOffset(xData.length, w),
+                yOffset = yAxis.getEdgeOffset(yData.length, h),
+                padding = this.get("styles").padding,
+                leftPadding = padding.left,
+                topPadding = padding.top,
+                dataWidth = w - (leftPadding + padding.right + xOffset),
+                dataHeight = h - (topPadding + padding.bottom + yOffset),
+                xcoords = [],
+                ycoords = [],
+                xMax = xAxis.get("maximum"),
+                xMin = xAxis.get("minimum"),
+                yMax = yAxis.get("maximum"),
+                yMin = yAxis.get("minimum"),
+                xScaleFactor = dataWidth / (xMax - xMin),
+                yScaleFactor = dataHeight / (yMax - yMin),
+                dataLength,
+                direction = this.get("direction"),
+                i = 0,
+                xMarkerPlane = [],
+                yMarkerPlane = [],
+                xMarkerPlaneOffset = this.get("xMarkerPlaneOffset"),
+                yMarkerPlaneOffset = this.get("yMarkerPlaneOffset"),
+                graphic = this.get("graphic");
+            graphic.set("width", w);
+            graphic.set("height", h);
+            dataLength = xData.length;
+            xOffset *= 0.5;
+            yOffset *= 0.5;
+            //Assuming a vertical graph has a range/category for its vertical axis.
+            if (direction === "vertical") {
+                yData = yData.reverse();
             }
-            else
-            {
-                nextX = NaN;
+            this._leftOrigin = Math.round((-xMin * xScaleFactor) + leftPadding + xOffset);
+            this._bottomOrigin = Math.round((dataHeight + topPadding + yOffset));
+            if (yMin < 0) {
+                this._bottomOrigin = this._bottomOrigin - (-yMin * yScaleFactor);
             }
-            if(isNumber(yValue))
-            {
-                nextY = ((dataHeight + topPadding + yOffset) - (yValue - yMin) * yScaleFactor);
+            for (; i < dataLength; ++i) {
+                xValue = parseFloat(xData[i]);
+                yValue = parseFloat(yData[i]);
+                if (isNumber(xValue)) {
+                    nextX = (((xValue - xMin) * xScaleFactor) + leftPadding + xOffset);
+                } else {
+                    nextX = NaN;
+                }
+                if (isNumber(yValue)) {
+                    nextY = ((dataHeight + topPadding + yOffset) - (yValue - yMin) * yScaleFactor);
+                } else {
+                    nextY = NaN;
+                }
+                xcoords.push(nextX);
+                ycoords.push(nextY);
+                xMarkerPlane.push({start:nextX - xMarkerPlaneOffset, end: nextX + xMarkerPlaneOffset});
+                yMarkerPlane.push({start:nextY - yMarkerPlaneOffset, end: nextY + yMarkerPlaneOffset});
             }
-            else
-            {
-                nextY = NaN;
-            }
-            xcoords.push(nextX);
-            ycoords.push(nextY);
-            xMarkerPlane.push({start:nextX - xMarkerPlaneOffset, end: nextX + xMarkerPlaneOffset});
-            yMarkerPlane.push({start:nextY - yMarkerPlaneOffset, end: nextY + yMarkerPlaneOffset});
-        }
-        this.set("xcoords", xcoords);
-        this.set("ycoords", ycoords);
-        this.set("xMarkerPlane", xMarkerPlane);
-        this.set("yMarkerPlane", yMarkerPlane);
-        this._dataLength = dataLength;
-    };
+            this.set("xcoords", xcoords);
+            this.set("ycoords", ycoords);
+            this.set("xMarkerPlane", xMarkerPlane);
+            this.set("yMarkerPlane", yMarkerPlane);
+            this._dataLength = dataLength;
+        };
     Y.ColumnSeries.prototype.setAreaData = setAreaData;
-}());
+    }());
     // HELPERS
     function convertedDataSetter() {
         var data = this.get('json'),
@@ -155,110 +146,51 @@ YUI.add('FinancistoApp', function (Y) {
         elem.setStyle('position', 'relative');
         loader.showBlock();
     }
-    function generateTransactionLabel(categoryItem, valueItem, itemIndex, series, seriesIndex) {
-        var div = Y.Node.create('<div class="transactionTooltip">'),
-            ul = Y.Node.create('<ul>'),
-            li;
-        [
-            'Payee name: ' + valueItem.displayName,
-            'Amount: ' + valueItem.value,
-            'Date: ' + categoryItem.value,
-        ].forEach(function (item) {
-            ul.append('<li>' + item + '</li>');
-        });
-        div.append(ul);
-        return div;
-    }
-    function processAllTransactions() {
-        var date = new Date(),
-            json = this.get('json'),
-            data = this.get('convertedData'),
-            amounts = {},
-            dates = {},
-            total = 0;
-
-        json.account.forEach(function (account) {
-            amounts[data.accounts[account._id].title] = 0;
-        });
-
-        json.transactions.sort(function (a, b) {
-            return a.datetime - b.datetime;
-        });
-
-        json.transactions.forEach(function (transaction) {
-            var from_change,
-                title = data.accounts[transaction.from_account_id].title,
-                totitle = null,
-                to_change = 0,
-                change = 0,
-                dateStr,
-                ob;
-
-            date.setTime(transaction.datetime);
-            dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
-            from_change = transaction.from_amount / 100;
-            if (transaction.to_account_id && data.accounts[transaction.to_account_id]) {
-                to_change = transaction.to_amount / 100;
-                totitle = data.accounts[transaction.to_account_id].title;
-                amounts[totitle] += to_change;
-            }
-
-            change = (from_change + to_change);
-            amounts[title] += from_change;
-            total += change;
-
-            if (!dates[dateStr]) {
-                dates[dateStr] = {
-                    change: 0,
-                    data: {}
-                };
-            }
-
-            dates[dateStr].change = change;
-
-            Object.keys(data.accounts).forEach(function (account) {
-                var title = data.accounts[account].title;
-                if (!dates[dateStr].data[title]) {
-                    dates[dateStr].data[title] = 0;
-                }
-
-                dates[dateStr].data[title] = amounts[title];
+    function generateTransactionLabel(transactions) {
+        return function (categoryItem, valueItem, itemIndex, series, seriesIndex) {
+            var div = Y.Node.create('<div class="transactionTooltip">'),
+                ul = Y.Node.create('<ul>'),
+                li;
+            [
+                'Payee name: ' + valueItem.displayName,
+                'Amount: ' + valueItem.value,
+                'Date: ' + categoryItem.value
+            ].forEach(function (item) {
+                ul.append('<li>' + item + '</li>');
             });
-
-            dates[dateStr].total = total;
-        });
-
-        return {
-            total: total,
-            dates: dates
-        };
+            div.append(ul);
+            return div;
+        }
     }
+    function processAllTransactions(cb) {
+        var json = this.get('json'),
+            data = this.get('convertedData'),
+            worker;
 
-    function processTransactions(jsonStr) {
-        var json, fields, dates;
+        worker = new Worker('/dataconverter.js');
+        worker.addEventListener('message', function (e) {
+            cb(e.data);
+        });
+        worker.postMessage({
+            type: 'transactions',
+            json: json,
+            convertedData: data
+        });
+        return;
+    }
+    function processTransactions(jsonStr, cb) {
+        var json, worker;
 
         json = JSON.parse(jsonStr);
-
-        fields = {};
-        dates = {};
-        json.forEach(function (transaction) {
-            var date = new Date(), dateStr;
-            date.setTime(transaction.datetime);
-            dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
-            if (!dates[dateStr]) {
-                dates[dateStr] = {};
-            }
-            if (!dates[dateStr][transaction.payee_title]) {
-                dates[dateStr][transaction.payee_title] = 0;
-                fields[transaction.payee_title] = 0;
-            }
-            dates[dateStr][transaction.payee_title] += +transaction.transaction_amount / 100;
+        worker = new Worker('/dataconverter.js');
+        worker.addEventListener('message', function (e) {
+            cb(e.data);
         });
-
-        return {
-            dates: dates,
-            fields: fields
-        };
+        worker.postMessage({
+            type: 'alltransactions',
+            json: json
+        });
+        return;
     }
     function onFailure(id, o, args) {
         var msg = null, response;
@@ -294,11 +226,11 @@ YUI.add('FinancistoApp', function (Y) {
             processedAllTransactions: {
                 value: null,
                 lazyAdd: true,
-                setter: processAllTransactions
+            //    setter: processAllTransactions
             },
             processedTransactions: {
                 lazyAdd: true,
-                setter: processTransactions
+                // setter: processTransactions
             }
         });
 
@@ -534,35 +466,37 @@ YUI.add('FinancistoApp', function (Y) {
         },
         onTransactionsResponse: function onTransactionsResponse(id, o, args) {
             this.noLoad('#DataPoster');
-            this.set('processedTransactions', o.response);
+            processTransactions.call(this, o.response, function (data) {
+                this.set('processedTransactions', data);
+                var transactions, trn, fields, dates;
+                trn = [];
+                transactions = this.get('processedTransactions');
+                fields = transactions.fields;
+                dates = transactions.dates;
 
-            var transactions, trn, fields, dates;
+                Object.keys(dates).forEach(function (date) {
+                    var ob = dates[date];
+                    ob.date = date;
+                    // trn.push(Y.merge(fields, ob));
+                    trn.push(ob);
+                });
+                this.transactionsChart = this.createChart({
+                    render: "#Transactions",
+                    type: 'column',
+                    stacked: true,
+                    tooltip: {
+                        styles: {
+                            borderRadius: '5px',
+                            backgroundColor: '#333',
+                            borderColor: '#000'
+                        },
+                        markerLabelFunction: generateTransactionLabel(trn)
+                    }
+                }, trn);
+                this.showCharts();
+            }.bind(this));
 
-            trn = [];
-            transactions = this.get('processedTransactions');
-            fields = transactions.fields;
-            dates = transactions.dates;
 
-            Object.keys(dates).forEach(function (date) {
-                var ob = dates[date];
-                ob.date = date;
-                // trn.push(Y.merge(fields, ob));
-                trn.push(ob);
-            });
-            this.transactionsChart = this.createChart({
-                render: "#Transactions",
-                type: 'column',
-                stacked: true,
-                tooltip: {
-                    styles: {
-                        borderRadius: '5px',
-                        backgroundColor: '#333',
-                        borderColor: '#000'
-                    },
-                    markerLabelFunction: generateTransactionLabel
-                }
-            }, trn);
-            this.showCharts();
         },
         showCharts: function showCharts() {
             Y.one('#Charts').showBlock();
@@ -623,10 +557,12 @@ YUI.add('FinancistoApp', function (Y) {
                             var json = JSON.parse(o.response);
                             if (json.account) {
                                 this.set('json', json);
-                                this.set('processedAllTransactions');
-                                this.getTransactions();
-                                this.goodData();
-                                this.onAllResponse(json);
+                                processAllTransactions.call(this, function (transactions) {
+                                    this.set('processedAllTransactions', transactions);
+                                    this.getTransactions();
+                                    this.goodData();
+                                    this.onAllResponse(json);
+                                }.bind(this));
                             } else {
                                 this.badData();
                             }
