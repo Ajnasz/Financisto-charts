@@ -31,6 +31,38 @@ function join(aData, bData, on, names) {
     }
     return output;
 }
+function leftJoin(aData, bData, on, names) {
+    var output = [], aNames, bNames;
+
+    names = names || {
+        aNames: {},
+        bNames: {}
+    };
+
+    aNames = Object.keys(names.aNames);
+    bNames = Object.keys(names.bNames);
+
+    if (aData && aData.length) {
+        aData.forEach(function (aItem) {
+            var merged = {};
+            bNames.forEach(function (key) {
+                merged[names.bNames[key]] = null;
+            });
+            bData.forEach(function (bItem) {
+                if (aItem[on.aField] === bItem[on.bField]) {
+                    aNames.forEach(function (key) {
+                        merged[names.aNames[key]] = aItem[key];
+                    });
+                    bNames.forEach(function (key) {
+                        merged[names.bNames[key]] = bItem[key];
+                    });
+                }
+            });
+            output.push(merged);
+        });
+    }
+    return output;
+}
 function Transactions() {
 }
 
