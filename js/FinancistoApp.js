@@ -382,23 +382,25 @@ YUI.add('FinancistoApp', function (Y) {
             };
             chartConf = Y.merge(defaultConf, conf);
             seriesStyles = {};
-            Object.keys(chartConf.dataProvider[0]).forEach(function (key) {
-                if (key !== chartConf.categoryKey) {
-                    var color = getNextColor();
-                    seriesStyles[key] = {
-                        line: {
-                            color: color
-                        },
-                        marker: {
-                            fill: {
+            chartConf.dataProvider.forEach(function (item) {
+                Object.keys(item).forEach(function (key) {
+                    if (key !== chartConf.categoryKey) {
+                        var color = getNextColor();
+                        seriesStyles[key] = {
+                            line: {
                                 color: color
                             },
-                            border: {
-                                color: color
+                            marker: {
+                                fill: {
+                                    color: color
+                                },
+                                border: {
+                                    color: color
+                                }
                             }
-                        }
-                    };
-                }
+                        };
+                    }
+                });
             });
 
             chartConf = Y.merge(chartConf, {styles: {series: seriesStyles}});
