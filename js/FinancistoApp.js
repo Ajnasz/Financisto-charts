@@ -212,6 +212,28 @@ YUI.add('FinancistoApp', function (Y) {
         Y.one('#Error').get('parentNode').showBlock();
     }
 
+    var getNextColor = (function () {
+        var colors = [
+            '#4572A7',
+            '#AA4643',
+            '#89A54E',
+            '#80699B',
+            '#3D96AE',
+            '#DB843D',
+            '#92A8CD',
+            '#A47D7C',
+            '#B5CA92'
+        ], colorIndex = 0;
+
+        return function getNextColor() {
+            colorIndex += 1;
+            if (colorIndex >= colors.length) {
+                colorIndex = 0;
+            }
+            return colors[colorIndex];
+        }
+    }());
+
     function FinancistoApp() {
         this.addAttrs({
             json: {
@@ -275,17 +297,6 @@ YUI.add('FinancistoApp', function (Y) {
         }.bind(this));
     }
     FinancistoApp.prototype = {
-        colors: [
-            '#4572A7',
-            '#AA4643',
-            '#89A54E',
-            '#80699B',
-            '#3D96AE',
-            '#DB843D',
-            '#92A8CD',
-            '#A47D7C',
-            '#B5CA92'
-        ],
         load: function load(elem) {
             elem = Y.one(elem);
             var loader = elem.one('.loader');
@@ -371,14 +382,9 @@ YUI.add('FinancistoApp', function (Y) {
             };
             chartConf = Y.merge(defaultConf, conf);
             seriesStyles = {};
-            colorIndex = 0;
             Object.keys(chartConf.dataProvider[0]).forEach(function (key) {
                 if (key !== chartConf.categoryKey) {
-                    colorIndex += 1;
-                    if (this.colors.length - 1 < colorIndex) {
-                        colorIndex = 0;
-                    }
-                    var color = this.colors[colorIndex];
+                    var color = getNextColor();
                     seriesStyles[key] = {
                         line: {
                             color: color
@@ -393,7 +399,7 @@ YUI.add('FinancistoApp', function (Y) {
                         }
                     };
                 }
-            }.bind(this));
+            });
 
             chartConf = Y.merge(chartConf, {styles: {series: seriesStyles}});
             chart = new Y.Chart(chartConf);
