@@ -88,6 +88,35 @@ function processTransactions(json) {
     };
 }
 
+function processConvertedData(data) {
+    var output = {};
+
+    [
+        'account',
+        'transactions',
+        'currency',
+        'locations',
+        'project',
+        'transactions',
+        'payee'
+    ].forEach(function (key) {
+        var outputKey = key;
+        if (key === 'account') {
+            outputKey = 'accounts';
+        } else if (key === 'project') {
+            outputKey = 'projects';
+        } else if (key === 'currency') {
+            outputKey = 'currencies';
+        }
+        output[outputKey] = {};
+        if (data[key]) {
+            data[key].forEach(function (item) {
+                output[outputKey][item._id] = item;
+            });
+        }
+    });
+    return output;
+}
 var self = self || this;
 
 self.addEventListener('message', function (event) {
@@ -100,7 +129,8 @@ self.addEventListener('message', function (event) {
         case 'alltransactions':
             output = processTransactions(event.data.json);
             break;
-        case 'bar':
+        case 'converteddata':
+            output = processConvertedData(event.data.json);
             break;
         }
     }

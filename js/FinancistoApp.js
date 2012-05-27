@@ -89,35 +89,24 @@ YUI.add('FinancistoApp', function (Y) {
     Y.ColumnSeries.prototype.setAreaData = setAreaData;
     }());
     // HELPERS
-    function convertedDataSetter() {
-        var data = this.get('json'),
-            output = {};
+    function convertedDataSetter(cb) {
+        if (true || !this.get('convertedData')) {
+            var json = this.get('json'),
+                worker = new Worker('/dataconverter.js');
 
-        [
-            'account',
-            'transactions',
-            'currency',
-            'locations',
-            'project',
-            'transactions',
-            'payee'
-        ].forEach(function (key) {
-            var outputKey = key;
-            if (key === 'account') {
-                outputKey = 'accounts';
-            } else if (key === 'project') {
-                outputKey = 'projects';
-            } else if (key === 'currency') {
-                outputKey = 'currencies';
-            }
-            output[outputKey] = {};
-            if (data[key]) {
-                data[key].forEach(function (item) {
-                    output[outputKey][item._id] = item;
-                });
-            }
-        });
-        return output;
+            worker.addEventListener('message', function (e) {
+                this.set('convertedData', e.data);
+                cb(e.data);
+            }.bind(this));
+
+            worker.postMessage({
+                type: 'converteddata',
+                json: json
+            });
+
+        } else {
+            cb(this.get('convertedData'));
+        }
     }
     function createListItem(acc) {
         var listItem = Y.Node.create('<li>'),
@@ -163,19 +152,21 @@ YUI.add('FinancistoApp', function (Y) {
         }
     }
     function processAllTransactions(cb) {
-        var json = this.get('json'),
-            data = this.get('convertedData'),
-            worker;
+        convertedDataSetter.call(this, function () {
+            var json = this.get('json'),
+                data = this.get('convertedData'),
+                worker;
 
-        worker = new Worker('/dataconverter.js');
-        worker.addEventListener('message', function (e) {
-            cb(e.data);
-        });
-        worker.postMessage({
-            type: 'transactions',
-            json: json,
-            convertedData: data
-        });
+            worker = new Worker('/dataconverter.js');
+            worker.addEventListener('message', function (e) {
+                cb(e.data);
+            });
+            worker.postMessage({
+                type: 'transactions',
+                json: json,
+                convertedData: data
+            });
+        }.bind(this));
         return;
     }
     function processTransactions(jsonStr, cb) {
@@ -243,7 +234,7 @@ YUI.add('FinancistoApp', function (Y) {
             convertedData: {
                 value: null,
                 lazyAdd: true,
-                setter: convertedDataSetter
+                // setter: convertedDataSetter
             },
             processedAllTransactions: {
                 value: null,
@@ -416,38 +407,40 @@ YUI.add('FinancistoApp', function (Y) {
             return chart;
         },
         addChartControls: function () {
-            var list,
-                data = this.get('convertedData');
+            convertedDataSetter.call(this, function () {
+                var data = this.get('convertedData'),
+                    list;
 
-            list = Y.Node.create('<ul>');
+                list = Y.Node.create('<ul>');
 
-            Object.keys(data.accounts).forEach(function (account) {
-                list.insert(createListItem(data.accounts[account]));
-            });
+                Object.keys(data.accounts).forEach(function (account) {
+                    list.insert(createListItem(data.accounts[account]));
+                });
 
-            list.delegate('click', function (e) {
-                var series = this.allDataChart.getSeries(e.target.getData('accountid'));
-                series.set('visible', !series.get('visible'));
-                if (series.get('visible')) {
-                    e.target.replaceClass('hidden', 'visible');
-                } else {
-                    e.target.replaceClass('visible', 'hidden');
-                }
-                this.allDataChart.render();
-            }.bind(this), 'button');
-
-            list.all('button').each(function (item) {
-                var series = this.allDataChart.getSeries(item.getData('accountid')),
-                    styles;
-                if (series) {
-                    styles = series.get('styles');
-                    if (styles) {
-                        item.one('span').setStyle('backgroundColor', styles.marker.fill.color);
+                list.delegate('click', function (e) {
+                    var series = this.allDataChart.getSeries(e.target.getData('accountid'));
+                    series.set('visible', !series.get('visible'));
+                    if (series.get('visible')) {
+                        e.target.replaceClass('hidden', 'visible');
+                    } else {
+                        e.target.replaceClass('visible', 'hidden');
                     }
-                }
-            }.bind(this));
+                    this.allDataChart.render();
+                }.bind(this), 'button');
 
-            Y.one('#Controls').insert(list);
+                list.all('button').each(function (item) {
+                    var series = this.allDataChart.getSeries(item.getData('accountid')),
+                        styles;
+                    if (series) {
+                        styles = series.get('styles');
+                        if (styles) {
+                            item.one('span').setStyle('backgroundColor', styles.marker.fill.color);
+                        }
+                    }
+                }.bind(this));
+
+                Y.one('#Controls').insert(list);
+            }.bind(this));
         },
         onAllResponse: function onAllResponse(json) {
             var trn = this.generateTransactions(),
