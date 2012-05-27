@@ -1,9 +1,9 @@
 {
-  "name": "financisto-visualizer",
-  "node": "0.6.17",
+  "name":"financisto-visualizer",
+  "node":"0.6.17",
   "author":"Lajos Koszti",
   "dependencies": {
       "ajn-session": ">= 0.0.3",
-      "yui": "= 3.5.1",
+      "yui": "= 3.5.1"
   }
 }
