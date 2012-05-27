@@ -3,6 +3,7 @@
   "node": "v0.6.17",
   "author":"Lajos Koszti",
   "dependencies": {
-      "ajn-session": ">= 0.0.3"
+      "ajn-session": ">= 0.0.3",
+      "yui": "= 3.5.1",
   }
 }
