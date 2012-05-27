@@ -159,8 +159,9 @@ YUI.add('FinancistoApp', function (Y) {
 
             worker = new Worker('/dataconverter.js');
             worker.addEventListener('message', function (e) {
+                this.set('processedAllTransactions', e.data);
                 cb(e.data);
-            });
+            }.bind(this));
             worker.postMessage({
                 type: 'transactions',
                 json: json,
@@ -175,8 +176,9 @@ YUI.add('FinancistoApp', function (Y) {
         json = JSON.parse(jsonStr);
         worker = new Worker('/dataconverter.js');
         worker.addEventListener('message', function (e) {
+            this.set('processedTransactions', e.data);
             cb(e.data);
-        });
+        }.bind(this));
         worker.postMessage({
             type: 'alltransactions',
             json: json
@@ -468,7 +470,6 @@ YUI.add('FinancistoApp', function (Y) {
         onTransactionsResponse: function onTransactionsResponse(id, o, args) {
             this.noLoad('#DataPoster');
             processTransactions.call(this, o.response, function (data) {
-                this.set('processedTransactions', data);
                 var transactions, trn, fields, dates;
                 trn = [];
                 transactions = this.get('processedTransactions');
@@ -559,7 +560,6 @@ YUI.add('FinancistoApp', function (Y) {
                             if (json.account) {
                                 this.set('json', json);
                                 processAllTransactions.call(this, function (transactions) {
-                                    this.set('processedAllTransactions', transactions);
                                     this.getTransactions();
                                     this.goodData();
                                     this.onAllResponse(json);
