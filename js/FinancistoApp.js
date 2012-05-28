@@ -444,6 +444,25 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 Y.one('#Controls').insert(list);
             }.bind(this));
         },
+        createTotalChart: function createTotalChart() {
+            var totalTransactions = this.getTotalTransactions(),
+                min, max;
+
+            this.totalChart = this.createChart({
+                render: '#Totalchart'
+            }, totalTransactions);
+
+            min = totalTransactions[0].total;
+            max = totalTransactions[0].total;
+            totalTransactions.forEach(function (transaction) {
+                min = transaction.total < min ? transaction.total : min;
+                max = transaction.total > max ? transaction.total : max;
+            });
+
+            this.totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
+            this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
+            this.addChartControls();
+        },
         onAllResponse: function onAllResponse(json) {
             var trn = this.generateTransactions(),
                 totalTransactions,
@@ -453,19 +472,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             this.allDataChart = this.createChart({
                 render: "#Mychart"
             }, trn);
-            totalTransactions = this.getTotalTransactions();
-            this.totalChart = this.createChart({
-                render: '#Totalchart'
-            }, totalTransactions);
-            min = totalTransactions[0].total;
-            max = totalTransactions[0].total;
-            totalTransactions.forEach(function (transaction) {
-                min = transaction.total < min ? transaction.total : min;
-                max = transaction.total > max ? transaction.total : max;
-            });
-            this.totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
-            this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
-            this.addChartControls();
+            this.createTotalChart();
         },
         onTransactionsResponse: function onTransactionsResponse(id, o, args) {
             this.noLoad('#DataPoster');
