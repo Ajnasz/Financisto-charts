@@ -44,6 +44,18 @@ Action.prototype.sendResponse = function (resp) {
 };
 Action.prototype.noClientCache = function () {
     this.setHeaders([{name: 'Cache-Control', value: 'no-cache'}]);
+    this.setExpireHeader(0);
+};
+Action.prototype.setExpireHeaderHour = function (hours) {
+    var expire = new Date();
+    expire.setTime(expire.getTime() + (hours * 3600000));
+    this.setExpireHeader(expire);
+};
+Action.prototype.setExpireHeader = function (expire) {
+    if (!(expire instanceof Date)) {
+        expire = new Date(expire);
+    }
+    this.setHeaders([{name: 'Expires', value: expire.toUTCString()}]);
 };
 Action.prototype.serverError = function () {
     this.sendResponse({

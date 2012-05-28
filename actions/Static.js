@@ -34,12 +34,15 @@ Static.prototype.serveStatic = function (request, data, type, status) {
     }
     switch (type) {
     case 'html':
+        this.setExpireHeaderHour(1);
         contentType = 'text/html';
         break;
     case 'js':
+        this.setExpireHeaderHour(1);
         contentType = 'text/javascript';
         break;
     case 'css':
+        this.setExpireHeaderHour(1);
         contentType = 'text/css';
         break;
     case 'json':
