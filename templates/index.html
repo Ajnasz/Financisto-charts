@@ -47,16 +47,33 @@
             </div>
             <div id="Charts">
                 <button type="button" class="reset button orange"><span>Reset</span></button>
-                <div>
-                    <h2>Total</h2>
-                    <div id="Totalchart" class="chart" style="height: 300px"></div>
-                    <h2>All transactions</h3>
-                    <div id="Mychart" class="chart"></div>
-                    <div id="Controls"></div>
-                </div>
-                <div>
-                    <h2>Transactions in last 31 days</h3>
-                    <div id="Transactions" class="chart"></div>
+                <div id="ChartTabs">
+                    <ul>
+                        <li><a href="#TotalTransactions">Total</a></li>
+                        <li><a href="#AllTransactions">All Transactions</a></li>
+                        <li><a href="#Last31DaysTransactions">Transactions in last 31 days</a></li>
+                    </ul>
+                    <div>
+                        <div id="TotalTransactions">
+                            <div>
+                                <h2>Total</h2>
+                                <div id="Totalchart" class="chart" style="height: 300px"></div>
+                            </div>
+                        </div>
+                        <div id="AllTransactions">
+                            <div>
+                                <h2>All transactions</h3>
+                                <div id="Mychart" class="chart"></div>
+                                <div id="Controls"></div>
+                            </div>
+                        </div>
+                        <div id="Last31DaysTransactions">
+                            <div>
+                                <h2>Transactions in last 31 days</h3>
+                                <div id="Transactions" class="chart"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

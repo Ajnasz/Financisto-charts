@@ -47,7 +47,7 @@ textarea, input {
     border-color: #808080;
 }
 .chart {
-    height: 600px;
+    height: 500px;
     position: relative;
 }
 #Controls {
@@ -180,8 +180,19 @@ textarea, input {
     background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
     filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
 }
+/* must do positioning, because for the button isn't clickable, because the h1 is above of it for some reason, if I only float it and move top -40px; */
+#Charts {
+    position: relative;
+}
+.reset {
+    right: 0;
+    top: -40px;
+    position: absolute;
+    z-index:1;
+}
+/*
 .reset {
     float: right;
+    margin-top: -40px;
 }
-
-
+*/

@@ -288,8 +288,33 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 }
             });
         }.bind(this));
+        this.chartTabView = new Y.TabView({
+            srcNode: '#ChartTabs'
+        });
+        // select the currently selected tab on tabview render
+        this.chartTabView.after('render', this.onTabSelect.bind(this));
+        // select the currently selected tab on selection change
+        this.chartTabView.after('selectionChange', this.onTabSelect.bind(this));
+        // TODO remove, debug
+        window.YYYY = this;
     }
     FinancistoApp.prototype = {
+        onTabSelect: function (tabId) {
+            // render chart only if the tabview is rendered
+            if (this.chartTabView.get('rendered')) {
+                switch (this.chartTabView.get('selection').get('panelNode').get('id')) {
+                    case 'TotalTransactions':
+                        this.renderTotalTransactions();
+                        break;
+                    case 'AllTransactions':
+                        this.renderAllTransactions();
+                        break;
+                    case 'Last31DaysTransactions':
+                        this.renderLast31DaysTransactions();
+                        break;
+                }
+            }
+        },
         load: function load(elem) {
             elem = Y.one(elem);
             var loader = elem.one('.loader');
@@ -313,30 +338,32 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 loader.hide();
             }
         },
-        getTotalTransactions: function getTotalTransactions() {
-            var processedAllTransactions, dates;
+        getTotalTransactions: function getTotalTransactions(cb) {
+            var processedAllTransactions, dates, output;
 
             processedAllTransactions = this.get('processedAllTransactions');
             dates = processedAllTransactions.dates;
 
-            return Object.keys(dates).map(function (item) {
+            output = Object.keys(dates).map(function (item) {
                 return {
                     date: item,
                     total: dates[item].total
                 };
             });
+            cb(output);
         },
-        generateTransactions: function generateTransactions() {
-            var processedAllTransactions, dates;
+        generateTransactions: function generateTransactions(cb) {
+            var processedAllTransactions, dates, output;
 
             processedAllTransactions = this.get('processedAllTransactions');
             dates = processedAllTransactions.dates;
 
-            return Object.keys(dates).map(function (item) {
+            output = Object.keys(dates).map(function (item) {
                 var ob = dates[item].data;
                 ob.date = item;
                 return ob;
             });
+            cb(output);
         },
         createChart: function createChart(conf, data) {
             var defaultConf, chartConf, chart, seriesStyles, colorIndex;
@@ -444,50 +471,33 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 Y.one('#Controls').insert(list);
             }.bind(this));
         },
-        createTotalChart: function createTotalChart() {
-            var totalTransactions = this.getTotalTransactions(),
-                min, max;
-
-            this.totalChart = this.createChart({
-                render: '#Totalchart'
-            }, totalTransactions);
-
-            min = totalTransactions[0].total;
-            max = totalTransactions[0].total;
-            totalTransactions.forEach(function (transaction) {
-                min = transaction.total < min ? transaction.total : min;
-                max = transaction.total > max ? transaction.total : max;
-            });
-
-            this.totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
-            this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
-            this.addChartControls();
-        },
-        createAllDataChart: function (trn) {
-            var trn = this.generateTransactions();
-            this.allDataChart = this.createChart({
-                render: "#Mychart"
-            }, trn);
-        },
-        onAllResponse: function onAllResponse(json) {
-            this.createAllDataChart();
-            this.createTotalChart();
-        },
-        onTransactionsResponse: function onTransactionsResponse(id, o, args) {
-            this.noLoad('#DataPoster');
-            processTransactions.call(this, o.response, function (data) {
-                var transactions, trn, fields, dates;
-                trn = [];
-                transactions = this.get('processedTransactions');
-                fields = transactions.fields;
-                dates = transactions.dates;
-
-                Object.keys(dates).forEach(function (date) {
-                    var ob = dates[date];
-                    ob.date = date;
-                    // trn.push(Y.merge(fields, ob));
-                    trn.push(ob);
+        createTotalChart: function createTotalChart(totalTransactions) {
+            setTimeout(function () {
+                var min, max;
+                min = totalTransactions[0].total;
+                max = totalTransactions[0].total;
+                totalTransactions.forEach(function (transaction) {
+                    min = transaction.total < min ? transaction.total : min;
+                    max = transaction.total > max ? transaction.total : max;
                 });
+                this.totalChart = this.createChart({
+                    render: '#Totalchart'
+                }, totalTransactions);
+
+                this.totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
+                this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
+            }.bind(this), 100);
+        },
+        createAllDataChart: function createAllDataChart(trn) {
+            setTimeout(function () {
+                this.allDataChart = this.createChart({
+                    render: "#Mychart"
+                }, trn);
+                this.addChartControls();
+            }.bind(this), 100);
+        },
+        createTransactionsChart: function createTransactionsChart(trn) {
+            setTimeout(function () {
                 this.transactionsChart = this.createChart({
                     render: "#Transactions",
                     type: 'column',
@@ -501,12 +511,61 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                         markerLabelFunction: generateTransactionLabel(trn)
                     }
                 }, trn);
-                this.showCharts();
+            }.bind(this), 100)
+        },
+        renderAllTransactions: function (attribute) {
+            if (!this.get('allTransactionsRendered')) {
+                this.set('allTransactionsRendered', true);
+                this.generateTransactions(this.createAllDataChart.bind(this));
+            }
+        },
+        renderLast31DaysTransactions: function (attribute) {
+            if (!this.get('last31DaysTransactionsRendered')) {
+                this.set('last31DaysTransactionsRendered', true);
+                this.getTransactions();
+            }
+        },
+        renderTotalTransactions: function () {
+            if (!this.get('totalChartRendered')) {
+                this.set('totalChartRendered', true);
+                this.getTotalTransactions(this.createTotalChart.bind(this));
+            }
+        },
+        onAllResponse: function onAllResponse() {
+            // this.generateTransactions(this.createAllDataChart.bind(this));
+            // this.getTotalTransactions(this.createTotalChart.bind(this));
+            if (!this.chartTabView.get('rendered')) {
+                this.chartTabView.render();
+            }
+        },
+        onTransactionsResponse: function onTransactionsResponse(id, o, args) {
+            this.noLoad('#DataPoster');
+            processTransactions.call(this, o.response, function (data) {
+                var transactions, trn, fields, dates;
+
+                trn = [];
+                transactions = this.get('processedTransactions');
+                fields = transactions.fields;
+                dates = transactions.dates;
+
+                Object.keys(dates).forEach(function (date) {
+                    var ob = dates[date];
+                    ob.date = date;
+                    trn.push(ob);
+                });
+                this.createTransactionsChart(trn);
             }.bind(this));
         },
         showCharts: function showCharts() {
             Y.one('#Charts').showBlock();
             Y.one('#DataForm').hide();
+            if (this.chartTabView.get('rendered')) {
+                this.chartTabView.item(0).set('selected', 1);
+            } else {
+                this.chartTabView.on('rendered', function () {
+                    this.chartTabView.item(0).set('selected', 1);
+                }.bind(this));
+            }
         },
         hideCharts: function hideCharts() {
             Y.one('#Charts').hide();
@@ -514,12 +573,15 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             Y.one('#Controls').empty();
             if (this.allDataChart) {
                 this.allDataChart.destroy();
+                this.set('allTransactionsRendered', false);
             }
             if (this.transactionsChart) {
                 this.transactionsChart.destroy();
+                this.set('last31DaysTransactionsRendered', false);
             }
             if (this.totalChart) {
                 this.totalChart.destroy();
+                this.set('totalChartRendered', false);
             }
         },
         badData: function badData(msg) {
@@ -549,6 +611,8 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 }
             });
         },
+        showTabs: function () {
+        },
         getAll: function getAll() {
             load('#DataPoster');
             Y.io('/data', {
@@ -557,14 +621,15 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 },
                 'on': {
                     'success': function getAllSuccessListener(id, o, args) {
-
                         this.noLoad('#DataPoster');
                         if (o.status === 200) {
                             var json = JSON.parse(o.response);
                             if (json.account) {
                                 this.set('json', json);
-                                processAllTransactions.call(this, function (transactions) {
+                                processAllTransactions.call(this, function allTransactionsCallback(transactions) {
+                                    /*
                                     this.getTransactions();
+                                    */
                                     this.goodData();
                                     this.onAllResponse(json);
                                 }.bind(this));
@@ -586,6 +651,6 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
     Y.augment(FinancistoApp, Y.Attribute);
     Y.FinancistoApp = FinancistoApp;
 }, '0.0.1', {
-    requires: ['base', 'charts', 'io', 'node++', 'event', 'tabview', 'console']
+    requires: ['base', 'charts', 'io', 'node++', 'event', 'tabview', 'console', 'tabview']
 });
 
