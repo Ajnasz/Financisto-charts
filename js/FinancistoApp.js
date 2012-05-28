@@ -1,6 +1,6 @@
 /*global YUI: true*/
 /*jslint nomen: true*/
-YUI.add('node++', function (Y) {
+YUI.add('node++', function NodePP(Y) {
     function showBlock() {
         this.setStyle('display', 'block');
     }
@@ -10,9 +10,9 @@ YUI.add('node++', function (Y) {
     Y.NodeList.importMethod(Y.Node.prototype, 'showBlock');
 }, {requires: ['node']});
 
-YUI.add('FinancistoApp', function (Y) {
+YUI.add('FinancistoApp', function FinancistoApp(Y) {
     (function () {
-        var setAreaData = function () {
+        function setAreaData() {
             var isNumber = Y.Lang.isNumber,
                 nextX,
                 nextY,
@@ -86,7 +86,7 @@ YUI.add('FinancistoApp', function (Y) {
             this.set("yMarkerPlane", yMarkerPlane);
             this._dataLength = dataLength;
         };
-    Y.ColumnSeries.prototype.setAreaData = setAreaData;
+        Y.ColumnSeries.prototype.setAreaData = setAreaData;
     }());
     // HELPERS
     function convertedDataSetter(cb) {
@@ -94,7 +94,7 @@ YUI.add('FinancistoApp', function (Y) {
             var json = this.get('json'),
                 worker = new Worker('/dataconverter.js');
 
-            worker.addEventListener('message', function (e) {
+            worker.addEventListener('message', function workerListenerConvertedDataSetter(e) {
                 this.set('convertedData', e.data);
                 cb(e.data);
             }.bind(this));
@@ -136,7 +136,7 @@ YUI.add('FinancistoApp', function (Y) {
         loader.showBlock();
     }
     function generateTransactionLabel(transactions) {
-        return function (categoryItem, valueItem, itemIndex, series, seriesIndex) {
+        return function transactionLabelGenerator(categoryItem, valueItem, itemIndex, series, seriesIndex) {
             var div = Y.Node.create('<div class="transactionTooltip">'),
                 ul = Y.Node.create('<ul>'),
                 li;
@@ -152,13 +152,13 @@ YUI.add('FinancistoApp', function (Y) {
         }
     }
     function processAllTransactions(cb) {
-        convertedDataSetter.call(this, function () {
+        convertedDataSetter.call(this, function convertedDataSetterCallback() {
             var json = this.get('json'),
                 data = this.get('convertedData'),
                 worker;
 
             worker = new Worker('/dataconverter.js');
-            worker.addEventListener('message', function (e) {
+            worker.addEventListener('message', function workerListenerAllTransactions(e) {
                 this.set('processedAllTransactions', e.data);
                 cb(e.data);
             }.bind(this));
@@ -175,7 +175,7 @@ YUI.add('FinancistoApp', function (Y) {
 
         json = JSON.parse(jsonStr);
         worker = new Worker('/dataconverter.js');
-        worker.addEventListener('message', function (e) {
+        worker.addEventListener('message', function workerListenerTransactions(e) {
             this.set('processedTransactions', e.data);
             cb(e.data);
         }.bind(this));
@@ -249,7 +249,7 @@ YUI.add('FinancistoApp', function (Y) {
             }
         });
 
-        Y.one('#DataPoster').on('submit', function (e) {
+        Y.one('#DataPoster').on('submit', function dataPosterSubmitListener(e) {
             e.preventDefault();
             load('#DataPoster');
             Y.io('/data', {
@@ -259,7 +259,7 @@ YUI.add('FinancistoApp', function (Y) {
                     useDisabled: false
                 },
                 on: {
-                    success: function () {
+                    success: function dataPosterSuccessListener() {
                         this.noLoad('#DataPoster');
                         this.goodData();
                         this.getAll();
@@ -274,15 +274,15 @@ YUI.add('FinancistoApp', function (Y) {
         });
         this.tabView.render();
         this.getAll();
-        Y.all('.reset').on('click', function (e) {
+        Y.all('.reset').on('click', function resetListener(e) {
             e.preventDefault();
             Y.io('/data', {
                 method: 'DELETE',
                 on: {
-                    success: function () {
+                    success: function resetSuccessListener() {
                         this.hideCharts();
                     }.bind(this),
-                    failure: function (response) {
+                    failure: function resetFailureListener(response) {
                         this.badData();
                     }.bind(this)
                 }
@@ -313,7 +313,7 @@ YUI.add('FinancistoApp', function (Y) {
                 loader.hide();
             }
         },
-        getTotalTransactions: function () {
+        getTotalTransactions: function getTotalTransactions() {
             var processedAllTransactions, dates;
 
             processedAllTransactions = this.get('processedAllTransactions');
@@ -326,7 +326,7 @@ YUI.add('FinancistoApp', function (Y) {
                 };
             });
         },
-        generateTransactions: function () {
+        generateTransactions: function generateTransactions() {
             var processedAllTransactions, dates;
 
             processedAllTransactions = this.get('processedAllTransactions');
@@ -408,7 +408,7 @@ YUI.add('FinancistoApp', function (Y) {
             });
             return chart;
         },
-        addChartControls: function () {
+        addChartControls: function addChartControls() {
             convertedDataSetter.call(this, function () {
                 var data = this.get('convertedData'),
                     list;
@@ -419,7 +419,7 @@ YUI.add('FinancistoApp', function (Y) {
                     list.insert(createListItem(data.accounts[account]));
                 });
 
-                list.delegate('click', function (e) {
+                list.delegate('click', function listClickListener(e) {
                     var series = this.allDataChart.getSeries(e.target.getData('accountid'));
                     series.set('visible', !series.get('visible'));
                     if (series.get('visible')) {
@@ -497,8 +497,6 @@ YUI.add('FinancistoApp', function (Y) {
                 }, trn);
                 this.showCharts();
             }.bind(this));
-
-
         },
         showCharts: function showCharts() {
             Y.one('#Charts').showBlock();
@@ -538,7 +536,7 @@ YUI.add('FinancistoApp', function (Y) {
             Y.io('transactions.json?days=31', {
                 'on': {
                     'success': this.onTransactionsResponse.bind(this),
-                    'failure': function () {
+                    'failure': function getTransactionsFailureListener() {
                         this.noLoad('#DataPoster');
                     }.bind(this)
 
@@ -552,7 +550,7 @@ YUI.add('FinancistoApp', function (Y) {
                     d: Date.now()
                 },
                 'on': {
-                    'success': function (id, o, args) {
+                    'success': function getAllSuccessListener(id, o, args) {
 
                         this.noLoad('#DataPoster');
                         if (o.status === 200) {
