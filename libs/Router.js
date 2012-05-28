@@ -23,6 +23,7 @@ Router.prototype = {
             var error = new TypeError('Route already defined.');
             error.routePath = path;
             error.routeMethod = method;
+            throw error;
         }
     },
     getRoute: function (path, method) {
