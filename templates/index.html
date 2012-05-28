@@ -11,54 +11,54 @@
         <link rel="stylesheet" type="text/css" href="/styles.css" />
     </head>
     <body class="yui3-skin-sam">
-      <a href="https://github.com/Ajnasz/Financisto-charts"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+        <a href="https://github.com/Ajnasz/Financisto-charts"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
         <h1>Financisto charts</h1>
         <div id="Main">
-          <div class="error">
-            <p id="Error"></p>
-          </div>
-          <div id="DataForm">
-              <h2>Set the data</h2>
-              <form action="/data" method="PUT" id="DataPoster">
-                <p>If you are a <a href="http://financisto.com">Financisto</a> user, on that page you can generate some charts to see how your costs were changed in recent times. You will need to create a backup file in your Financisto app, and upload somewhere where it's publicly available to enable to download it. For example you can use your Dropbox account: copy a backup file into your public folder and use it's url to generate charts.<br />
-                If you can't or don't want to put into a public place, you can also upload it's content by yourself. First switch to the "Copy from uncompressed backup file" tab below, then unzip the backup file and open it in a text editor then copy its content into the text area on this page.</p>
-                  <div id="Tabs">
-                      <ul>
-                          <li><a href="#DownloadFromURL">Download backup file from remote URL</a></li>
-                          <li><a href="#CopyData">Copy from uncompressed backup file</a></li>
-                      </ul>
-                      <div>
-                          <div id="DownloadFromURL">
-                              <div>
-                                  <label for="UrlField">URL:</label><br />
-                                  <input type="url" name="url" id="UrlField" /><br />
-                              </div>
-                          </div>
-                          <div id="CopyData">
-                              <div>
-                                  <label for="DataField">Uncompressed data:</label><br />
-                                  <textarea name="data" id="DataField"></textarea>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  <button type="submit" class="button orange">Generate charts</button>
-              </form>
-          </div>
-          <div id="Charts">
-            <button type="button" class="reset button orange"><span>Reset</span></button>
-              <div>
-                  <h2>Total</h2>
-                  <div id="Totalchart" class="chart" style="height: 300px"></div>
-                  <h2>All transactions</h3>
-                  <div id="Mychart" class="chart"></div>
-                  <div id="Controls"></div>
-              </div>
-              <div>
-                  <h2>Transactions in last 31 days</h3>
-                  <div id="Transactions" class="chart"></div>
-              </div>
-          </div>
+            <div class="error">
+                <p id="Error"></p>
+            </div>
+            <div id="DataForm">
+                <h2>Set the data</h2>
+                <form action="/data" method="PUT" id="DataPoster">
+                    <p>If you are a <a href="http://financisto.com">Financisto</a> user, on that page you can generate some charts to see how your costs were changed in recent times. You will need to create a backup file in your Financisto app, and upload somewhere where it's publicly available to enable to download it. For example you can use your Dropbox account: copy a backup file into your public folder and use it's url to generate charts.<br />
+                    If you can't or don't want to put into a public place, you can also upload it's content by yourself. First switch to the "Copy from uncompressed backup file" tab below, then unzip the backup file and open it in a text editor then copy its content into the text area on this page.</p>
+                    <div id="Tabs">
+                        <ul>
+                            <li><a href="#DownloadFromURL">Download backup file from remote URL</a></li>
+                            <li><a href="#CopyData">Copy from uncompressed backup file</a></li>
+                        </ul>
+                        <div>
+                            <div id="DownloadFromURL">
+                                <div>
+                                    <label for="UrlField">URL:</label><br />
+                                    <input type="url" name="url" id="UrlField" /><br />
+                                </div>
+                            </div>
+                            <div id="CopyData">
+                                <div>
+                                    <label for="DataField">Uncompressed data:</label><br />
+                                    <textarea name="data" id="DataField"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="button orange">Generate charts</button>
+                </form>
+            </div>
+            <div id="Charts">
+                <button type="button" class="reset button orange"><span>Reset</span></button>
+                <div>
+                    <h2>Total</h2>
+                    <div id="Totalchart" class="chart" style="height: 300px"></div>
+                    <h2>All transactions</h3>
+                    <div id="Mychart" class="chart"></div>
+                    <div id="Controls"></div>
+                </div>
+                <div>
+                    <h2>Transactions in last 31 days</h3>
+                    <div id="Transactions" class="chart"></div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
