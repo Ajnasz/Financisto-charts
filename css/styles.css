@@ -155,11 +155,6 @@ textarea, input {
 .button:hover {
     text-decoration: none;
 }
-.button:active {
-    position: relative;
-    top: 1px;
-}
-
 .orange {
     color: #fef4e9;
     border: solid 1px #da7c0c;
