@@ -463,15 +463,14 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
             this.addChartControls();
         },
-        onAllResponse: function onAllResponse(json) {
-            var trn = this.generateTransactions(),
-                totalTransactions,
-                min,
-                max;
-
+        createAllDataChart: function (trn) {
+            var trn = this.generateTransactions();
             this.allDataChart = this.createChart({
                 render: "#Mychart"
             }, trn);
+        },
+        onAllResponse: function onAllResponse(json) {
+            this.createAllDataChart();
             this.createTotalChart();
         },
         onTransactionsResponse: function onTransactionsResponse(id, o, args) {
