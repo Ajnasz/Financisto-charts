@@ -372,6 +372,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                     total: dates[item].total
                 };
             });
+
             cb(output);
         },
         generateTransactions: function generateTransactions(cb) {

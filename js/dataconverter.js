@@ -45,8 +45,11 @@ function convertTransactions(json, convertedData) {
             ob;
 
         date.setTime(transaction.datetime);
+
         dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
+
         from_change = transaction.from_amount / 100;
+
         if (transaction.to_account_id && data.accounts[transaction.to_account_id]) {
             to_change = transaction.to_amount / 100;
             totitle = data.accounts[transaction.to_account_id].title;
@@ -67,12 +70,14 @@ function convertTransactions(json, convertedData) {
         dates[dateStr].change = change;
 
         Object.keys(data.accounts).forEach(function (account) {
-            var title = data.accounts[account].title;
-            if (!dates[dateStr].data[title]) {
-                dates[dateStr].data[title] = 0;
-            }
+            var accountTitle = data.accounts[account].title;
+            if (accountTitle === title || (totitle && totitle === accountTitle)) {
+                if (!dates[dateStr].data[title]) {
+                    dates[dateStr].data[title] = 0;
+                }
 
-            dates[dateStr].data[title] = amounts[title];
+                dates[dateStr].data[title] = amounts[title];
+            }
         });
 
         dates[dateStr].total = total;
