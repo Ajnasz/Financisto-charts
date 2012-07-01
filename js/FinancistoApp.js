@@ -376,8 +376,8 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                     case 'AllTransactions':
                         this.renderAllTransactions();
                         break;
-                    case 'Last31DaysTransactions':
-                        this.renderLast31DaysTransactions();
+                    case 'LastDaysTransactions':
+                        this.renderLastDaysTransactions();
                         break;
                 }
             }
