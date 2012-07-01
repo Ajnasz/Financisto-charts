@@ -115,7 +115,8 @@ Transactions.prototype.executeGet = function (request, requestData) {
                     '_id': 'transaction_id',
                     'from_amount': 'transaction_amount',
                     'from_account_id': 'transaction_account_id',
-                    'datetime': 'datetime'
+                    'datetime': 'datetime',
+                    'note': 'transaction_note'
                 },
                 bNames: {
                     '_id': 'payee_id',
@@ -135,7 +136,8 @@ Transactions.prototype.executeGet = function (request, requestData) {
                     'transaction_id': 'transaction_id',
                     'transaction_amount': 'transaction_amount',
                     'datetime': 'datetime',
-                    'payee_title': 'payee_title'
+                    'payee_title': 'payee_title',
+                    'transaction_note': 'transaction_note'
                 },
                 bNames: {
                     title: 'account_title',
@@ -152,7 +154,8 @@ Transactions.prototype.executeGet = function (request, requestData) {
                 'transaction_amount': 'transaction_amount',
                 'datetime': 'datetime',
                 'payee_title': 'payee_title',
-                'account_title': 'account_title'
+                'account_title': 'account_title',
+                'transaction_note': 'transaction_note'
             },
             bNames: {
                 'name': 'currency_name',

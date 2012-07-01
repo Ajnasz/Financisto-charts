@@ -89,24 +89,31 @@ function convertTransactions(json, convertedData) {
     };
 }
 
-
 function processTransactions(json) {
     var fields, dates;
 
     fields = {};
     dates = {};
+    labelCount = {};
     json.forEach(function (transaction) {
-        var date = new Date(), dateStr;
+        var date = new Date(),
+            label = transaction.payee_title,
+            dateStr;
         date.setTime(transaction.datetime);
         dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
         if (!dates[dateStr]) {
             dates[dateStr] = {};
         }
-        if (!dates[dateStr][transaction.payee_title]) {
-            dates[dateStr][transaction.payee_title] = 0;
-            fields[transaction.payee_title] = 0;
+        if (dates[dateStr][label]) {
+            if (!labelCount[label]) {
+                labelCount[label] = 1;
+            }
+            labelCount[label] += 1;
+            label = '__duplicated_key__' + labelCount[label] + '__' + label;
         }
-        dates[dateStr][transaction.payee_title] += +transaction.transaction_amount / 100;
+        dates[dateStr][label] = 0;
+        fields[label] = 0;
+        dates[dateStr][label] += +transaction.transaction_amount / 100;
     });
 
     return {

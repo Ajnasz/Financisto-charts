@@ -157,20 +157,65 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
         elem.setStyle('position', 'relative');
         loader.showBlock();
     }
-    function generateTransactionLabel(transactions) {
-        return function transactionLabelGenerator(categoryItem, valueItem, itemIndex, series, seriesIndex) {
+    function createTooltip(list) {
             var div = Y.Node.create('<div class="transactionTooltip">'),
                 ul = Y.Node.create('<ul>'),
                 li;
-            [
-                'Payee name: ' + valueItem.displayName,
-                'Amount: ' + valueItem.value,
-                'Date: ' + categoryItem.value
-            ].forEach(function (item) {
+            list.forEach(function (item) {
                 ul.append('<li>' + item + '</li>');
             });
             div.append(ul);
             return div;
+    }
+    function generateTransactionLabel(transactions, json) {
+        var convertedRegEx, d;
+        // __duplicated_key__ string insterted into the beginning of keys which
+        // are defined twice or more for a payee
+        convertedRegEx = /^__duplicated_key__\d+__/;
+        d = new Date();
+        d.setHours(0);
+        d.setMinutes(0);
+        d.setSeconds(0);
+        d.setMilliseconds(0);
+        function findTransaction(date, amount, payee) {
+            var dateArr = date.split('-');
+            d.setFullYear(+dateArr[0]);
+            d.setMonth(+dateArr[1] - 1);
+            d.setDate(+dateArr[2]);
+            var f = json.filter(function (item) {
+                var itemDate = new Date(+item.datetime);
+                itemDate.setHours(0);
+                itemDate.setMinutes(0);
+                itemDate.setSeconds(0);
+                itemDate.setMilliseconds(0);
+                return d.getTime() === itemDate.getTime();
+            });
+            if (f.length > 1) {
+                f = f.filter(function (item) {
+                    return +item.transaction_amount/100 === +amount;
+                });
+            }
+            if (f.length > 1) {
+                if (convertedRegEx.test(payee)) {
+                    payee = payee.replace(convertedRegEx, '');
+                }
+                f.filter(function (item) {
+                    return item.payee_title === payee;
+                });
+            }
+            return f[0];
+        }
+        return function transactionLabelGenerator(categoryItem, valueItem, itemIndex, series, seriesIndex) {
+           var transaction = findTransaction(categoryItem.value, valueItem.value, valueItem.displayName);
+           var list = [
+                'Payee name: ' + transaction.payee_title + ' [' + transaction.account_title + ']',
+                'Amount: ' + valueItem.value + ' ' + transaction.currency_symbol,
+                'Date: ' + categoryItem.value
+            ];
+            if (transaction.transaction_note) {
+                list.push('Note: ' + transaction.transaction_note);
+            }
+           return createTooltip(list);
         }
     }
     function processAllTransactions(cb) {
@@ -242,7 +287,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
 
         return function getNextColor() {
             colorIndex += 1;
-            if (colorIndex >= colors.length) {
+            if (colorIndex >= colors.length -1) {
                 colorIndex = 0;
             }
             return colors[colorIndex];
@@ -403,6 +448,12 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                         fontFamily: 'sans-serif',
                         fontSize: '13px',
                         padding: '2px 5px'
+                    },
+                    markerLabelFunction: function (categoryItem, valueItem, itemIndex, series, seriesIndex) {
+                        return createTooltip([
+                            valueItem.displayName + ': ' + valueItem.value,
+                            categoryItem.displayName + ': ' + categoryItem.value
+                        ]);
                     }
                 },
                 verticalGridlines: {
@@ -519,7 +570,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 this.addChartControls();
             }.bind(this), 100);
         },
-        createTransactionsChart: function createTransactionsChart(trn) {
+        createTransactionsChart: function createTransactionsChart(trn, json) {
             setTimeout(function () {
                 this.transactionsChart = this.createChart({
                     render: "#Transactions",
@@ -531,7 +582,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                             backgroundColor: '#333',
                             borderColor: '#000'
                         },
-                        markerLabelFunction: generateTransactionLabel(trn)
+                        markerLabelFunction: generateTransactionLabel(trn, json)
                     }
                 }, trn);
             }.bind(this), 100)
@@ -542,9 +593,9 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 this.generateTransactions(this.createAllDataChart.bind(this));
             }
         },
-        renderLast31DaysTransactions: function (attribute) {
-            if (!this.get('last31DaysTransactionsRendered')) {
-                this.set('last31DaysTransactionsRendered', true);
+        renderLastDaysTransactions: function () {
+            if (!this.get('lastDaysTransactionsRendered')) {
+                this.set('lastDaysTransactionsRendered', true);
                 this.getTransactions();
             }
         },
@@ -576,7 +627,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                     ob.date = date;
                     trn.push(ob);
                 });
-                this.createTransactionsChart(trn);
+                this.createTransactionsChart(trn, JSON.parse(o.response));
             }.bind(this));
         },
         showCharts: function showCharts() {
@@ -600,7 +651,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             }
             if (this.transactionsChart) {
                 this.transactionsChart.destroy();
-                this.set('last31DaysTransactionsRendered', false);
+                this.set('lastDaysTransactionsRendered', false);
             }
             if (this.totalChart) {
                 this.totalChart.destroy();

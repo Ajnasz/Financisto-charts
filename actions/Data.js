@@ -63,4 +63,3 @@ Data.prototype.executeDel = function () {
 };
 
 exports.Data = Data;
-
