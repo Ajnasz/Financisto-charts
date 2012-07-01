@@ -1,6 +1,6 @@
 {
   "name":"financisto-visualizer",
-  "node":"0.6.17",
+  "node":"0.8.1",
   "author":"Lajos Koszti",
   "dependencies": {
       "ajn-session": ">= 0.0.3",
