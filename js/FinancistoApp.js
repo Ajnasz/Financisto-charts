@@ -381,6 +381,20 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                         break;
                 }
             }
+            if (!this.get('daySelectSubscribed')) {
+                this.set('daySelectSubscribed', true);
+                var timeout;
+                Y.one('#DaySelect').on('valuechange', function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        this.transactionsChart.destroy();
+                        this.set('lastDaysTransactionsRendered', false);
+                        this.renderLastDaysTransactions();
+                    }.bind(this), 500);
+                }.bind(this));
+            }
         },
         load: function load(elem) {
             elem = Y.one(elem);
@@ -674,16 +688,19 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             showError();
         },
         getTransactions: function getTransactions() {
-            load('#DataPoster');
-            Y.io('transactions.json?days=31', {
-                'on': {
-                    'success': this.onTransactionsResponse.bind(this),
-                    'failure': function getTransactionsFailureListener() {
-                        this.noLoad('#DataPoster');
-                    }.bind(this)
+            var value = parseInt(Y.one('#DaySelect').get('value'), 10);
+            if (value && value > 0) {
+                load('#DataPoster');
+                Y.io('transactions.json?days=' + Y.one('#DaySelect').get('value'), {
+                    'on': {
+                        'success': this.onTransactionsResponse.bind(this),
+                        'failure': function getTransactionsFailureListener() {
+                            this.noLoad('#DataPoster');
+                        }.bind(this)
 
-                }
-            });
+                    }
+                });
+            }
         },
         showTabs: function () {
         },
@@ -724,7 +741,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
 
     Y.augment(FinancistoApp, Y.Attribute);
     Y.FinancistoApp = FinancistoApp;
-}, '0.0.1', {
+}, '0.0.2', {
     requires: ['base', 'charts', 'io', 'node++', 'event', 'tabview', 'console', 'tabview']
 });
 

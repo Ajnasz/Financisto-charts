@@ -51,7 +51,7 @@
                     <ul>
                         <li><a href="#TotalTransactions">Total</a></li>
                         <li><a href="#AllTransactions">All Transactions</a></li>
-                        <li><a href="#Last31DaysTransactions">Transactions in last 31 days</a></li>
+                        <li><a href="#LastDaysTransactions">Transactions in last few days</a></li>
                     </ul>
                     <div>
                         <div id="TotalTransactions">
@@ -67,9 +67,10 @@
                                 <div id="Controls"></div>
                             </div>
                         </div>
-                        <div id="Last31DaysTransactions">
+                        <div id="LastDaysTransactions">
                             <div>
-                                <h2>Transactions in last 31 days</h3>
+                                <h2>Transactions in last few days</h3>
+                                <label>Days: <input type="number" min="1" value="31" id="DaySelect" /></label>
                                 <div id="Transactions" class="chart"></div>
                             </div>
                         </div>
