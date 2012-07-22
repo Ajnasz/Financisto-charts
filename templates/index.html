@@ -6,6 +6,7 @@
         <title>Financisto charts</title>
         <script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
         <script src="/a.js"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssbase/cssbase-min.css">
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/grids-min.css">
         <link rel="stylesheet" type="text/css" href="/styles.css" />
@@ -57,13 +58,15 @@
                         <div id="TotalTransactions">
                             <div>
                                 <h2>Total</h2>
-                                <div id="Totalchart" class="chart" style="height: 300px"></div>
+                                <!-- <div id="Totalchart" class="chart" style="height: 300px"></div> -->
+                                <div id="TotalchartG" class="chart" style="height: 300px"></div>
                             </div>
                         </div>
                         <div id="AllTransactions">
                             <div>
                                 <h2>All transactions</h3>
-                                <div id="Mychart" class="chart"></div>
+                                <!-- <div id="Mychart" class="chart"></div> -->
+                                <div id="MychartG" class="chart"></div>
                                 <div id="Controls"></div>
                             </div>
                         </div>
@@ -71,7 +74,8 @@
                             <div>
                                 <h2>Transactions in last few days</h3>
                                 <label>Days: <input type="number" min="1" value="31" id="DaySelect" /></label>
-                                <div id="Transactions" class="chart"></div>
+                                <!-- <div id="Transactions" class="chart"></div> -->
+                                <div id="TransactionsG" class="chart"></div>
                             </div>
                         </div>
                     </div>

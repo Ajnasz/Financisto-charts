@@ -27,8 +27,21 @@ YUI({
     modules: {
         'FinancistoApp': {
             fullpath: '/FinancistoApp.js',
-            requires: ['base', 'charts', 'io', 'node', 'event', 'tabview',
-                'console', 'attribute']
+            requires: [
+                'base',
+                // 'charts',
+                'io',
+                'node++',
+                'event',
+                'tabview',
+                'console',
+                'attribute'
+            ]
+        },
+        'node++': {
+            requires: [
+                'node'
+            ]
         },
         'ajn:dao': {
             fullpath: '/ajndao.js'

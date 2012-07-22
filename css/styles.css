@@ -50,6 +50,9 @@ textarea, input {
     height: 500px;
     position: relative;
 }
+#TransactionsG {
+    height: auto;
+}
 #Controls {
     margin: 1em 0;
 }

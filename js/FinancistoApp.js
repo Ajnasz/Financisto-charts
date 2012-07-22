@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/*global YUI: true*/
-/*jslint nomen: true*/
+/*global YUI: true, google: true, Worker: true*/
+/*jslint nomen: true, es5: true, browser: true*/
 YUI.add('node++', function NodePP(Y) {
     function showBlock() {
         this.setStyle('display', 'block');
@@ -32,103 +32,21 @@ YUI.add('node++', function NodePP(Y) {
     Y.NodeList.importMethod(Y.Node.prototype, 'showBlock');
 }, {requires: ['node']});
 
-YUI.add('FinancistoApp', function FinancistoApp(Y) {
-    (function () {
-        function setAreaData() {
-            var isNumber = Y.Lang.isNumber,
-                nextX,
-                nextY,
-                graph = this.get("graph"),
-                w = graph.get("width"),
-                h = graph.get("height"),
-                xAxis = this.get("xAxis"),
-                yAxis = this.get("yAxis"),
-                xData = this.get("xData").concat(),
-                yData = this.get("yData").concat(),
-                xValue,
-                yValue,
-                xOffset = xAxis.getEdgeOffset(xData.length, w),
-                yOffset = yAxis.getEdgeOffset(yData.length, h),
-                padding = this.get("styles").padding,
-                leftPadding = padding.left,
-                topPadding = padding.top,
-                dataWidth = w - (leftPadding + padding.right + xOffset),
-                dataHeight = h - (topPadding + padding.bottom + yOffset),
-                xcoords = [],
-                ycoords = [],
-                xMax = xAxis.get("maximum"),
-                xMin = xAxis.get("minimum"),
-                yMax = yAxis.get("maximum"),
-                yMin = yAxis.get("minimum"),
-                xScaleFactor = dataWidth / (xMax - xMin),
-                yScaleFactor = dataHeight / (yMax - yMin),
-                dataLength,
-                direction = this.get("direction"),
-                i = 0,
-                xMarkerPlane = [],
-                yMarkerPlane = [],
-                xMarkerPlaneOffset = this.get("xMarkerPlaneOffset"),
-                yMarkerPlaneOffset = this.get("yMarkerPlaneOffset"),
-                graphic = this.get("graphic");
-            graphic.set("width", w);
-            graphic.set("height", h);
-            dataLength = xData.length;
-            xOffset *= 0.5;
-            yOffset *= 0.5;
-            //Assuming a vertical graph has a range/category for its vertical axis.
-            if (direction === "vertical") {
-                yData = yData.reverse();
-            }
-            this._leftOrigin = Math.round((-xMin * xScaleFactor) + leftPadding + xOffset);
-            this._bottomOrigin = Math.round((dataHeight + topPadding + yOffset));
-            if (yMin < 0) {
-                this._bottomOrigin = this._bottomOrigin - (-yMin * yScaleFactor);
-            }
-            for (; i < dataLength; ++i) {
-                xValue = parseFloat(xData[i]);
-                yValue = parseFloat(yData[i]);
-                if (isNumber(xValue)) {
-                    nextX = (((xValue - xMin) * xScaleFactor) + leftPadding + xOffset);
-                } else {
-                    nextX = NaN;
-                }
-                if (isNumber(yValue)) {
-                    nextY = ((dataHeight + topPadding + yOffset) - (yValue - yMin) * yScaleFactor);
-                } else {
-                    nextY = NaN;
-                }
-                xcoords.push(nextX);
-                ycoords.push(nextY);
-                xMarkerPlane.push({start:nextX - xMarkerPlaneOffset, end: nextX + xMarkerPlaneOffset});
-                yMarkerPlane.push({start:nextY - yMarkerPlaneOffset, end: nextY + yMarkerPlaneOffset});
-            }
-            this.set("xcoords", xcoords);
-            this.set("ycoords", ycoords);
-            this.set("xMarkerPlane", xMarkerPlane);
-            this.set("yMarkerPlane", yMarkerPlane);
-            this._dataLength = dataLength;
-        };
-        Y.ColumnSeries.prototype.setAreaData = setAreaData;
-    }());
+YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
     // HELPERS
     function convertedDataSetter(cb) {
-        if (true || !this.get('convertedData')) {
-            var json = this.get('json'),
-                worker = new Worker('/dataconverter.js');
+        var json = this.get('json'),
+            worker = new Worker('/dataconverter.js');
 
-            worker.addEventListener('message', function workerListenerConvertedDataSetter(e) {
-                this.set('convertedData', e.data);
-                cb(e.data);
-            }.bind(this));
+        worker.addEventListener('message', function workerListenerConvertedDataSetter(e) {
+            this.set('convertedData', e.data);
+            cb(e.data);
+        }.bind(this));
 
-            worker.postMessage({
-                type: 'converteddata',
-                json: json
-            });
-
-        } else {
-            cb(this.get('convertedData'));
-        }
+        worker.postMessage({
+            type: 'converteddata',
+            json: json
+        });
     }
     function createListItem(acc) {
         var listItem = Y.Node.create('<li>'),
@@ -158,14 +76,14 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
         loader.showBlock();
     }
     function createTooltip(list) {
-            var div = Y.Node.create('<div class="transactionTooltip">'),
-                ul = Y.Node.create('<ul>'),
-                li;
-            list.forEach(function (item) {
-                ul.append('<li>' + item + '</li>');
-            });
-            div.append(ul);
-            return div;
+        var div = Y.Node.create('<div class="transactionTooltip">'),
+            ul = Y.Node.create('<ul>'),
+            li;
+        list.forEach(function (item) {
+            ul.append('<li>' + item + '</li>');
+        });
+        div.append(ul);
+        return div;
     }
     function generateTransactionLabel(transactions, json) {
         var convertedRegEx, d;
@@ -178,11 +96,11 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
         d.setSeconds(0);
         d.setMilliseconds(0);
         function findTransaction(date, amount, payee) {
-            var dateArr = date.split('-');
+            var dateArr = date.split('-'), f;
             d.setFullYear(+dateArr[0]);
             d.setMonth(+dateArr[1] - 1);
             d.setDate(+dateArr[2]);
-            var f = json.filter(function (item) {
+            f = json.filter(function (item) {
                 var itemDate = new Date(+item.datetime);
                 itemDate.setHours(0);
                 itemDate.setMinutes(0);
@@ -192,7 +110,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             });
             if (f.length > 1) {
                 f = f.filter(function (item) {
-                    return +item.transaction_amount/100 === +amount;
+                    return +item.transaction_amount / 100 === +amount;
                 });
             }
             if (f.length > 1) {
@@ -205,9 +123,14 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             }
             return f[0];
         }
-        return function transactionLabelGenerator(categoryItem, valueItem, itemIndex, series, seriesIndex) {
-           var transaction = findTransaction(categoryItem.value, valueItem.value, valueItem.displayName);
-           var list = [
+        return function transactionLabelGenerator(categoryItem, valueItem,
+                                                  itemIndex, series,
+                                                  seriesIndex) {
+            var transaction, list;
+            transaction = findTransaction(categoryItem.value,
+                                              valueItem.value,
+                                              valueItem.displayName);
+            list = [
                 'Payee name: ' + transaction.payee_title + ' [' + transaction.account_title + ']',
                 'Amount: ' + valueItem.value + ' ' + transaction.currency_symbol,
                 'Date: ' + categoryItem.value
@@ -215,8 +138,8 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             if (transaction.transaction_note) {
                 list.push('Note: ' + transaction.transaction_note);
             }
-           return createTooltip(list);
-        }
+            return createTooltip(list);
+        };
     }
     function processAllTransactions(cb) {
         convertedDataSetter.call(this, function convertedDataSetterCallback() {
@@ -287,11 +210,11 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
 
         return function getNextColor() {
             colorIndex += 1;
-            if (colorIndex >= colors.length -1) {
+            if (colorIndex >= colors.length - 1) {
                 colorIndex = 0;
             }
             return colors[colorIndex];
-        }
+        };
     }());
 
     function FinancistoApp() {
@@ -370,15 +293,15 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             // render chart only if the tabview is rendered
             if (this.chartTabView.get('rendered')) {
                 switch (this.chartTabView.get('selection').get('panelNode').get('id')) {
-                    case 'TotalTransactions':
-                        this.renderTotalTransactions();
-                        break;
-                    case 'AllTransactions':
-                        this.renderAllTransactions();
-                        break;
-                    case 'LastDaysTransactions':
-                        this.renderLastDaysTransactions();
-                        break;
+                case 'TotalTransactions':
+                    this.renderTotalTransactions();
+                    break;
+                case 'AllTransactions':
+                    this.renderAllTransactions();
+                    break;
+                case 'LastDaysTransactions':
+                    this.renderLastDaysTransactions();
+                    break;
                 }
             }
             if (!this.get('daySelectSubscribed')) {
@@ -389,7 +312,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                         clearTimeout(timeout);
                     }
                     timeout = setTimeout(function () {
-                        this.transactionsChart.destroy();
+                        // this.transactionsChart.destroy();
                         this.set('lastDaysTransactionsRendered', false);
                         this.renderLastDaysTransactions();
                     }.bind(this), 500);
@@ -424,6 +347,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
 
             processedAllTransactions = this.get('processedAllTransactions');
             dates = processedAllTransactions.dates;
+            Y.foo = dates;
 
             output = Object.keys(dates).map(function (item) {
                 return {
@@ -445,7 +369,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 ob.date = item;
                 return ob;
             });
-            cb(output);
+            cb(output, dates);
         },
         createChart: function createChart(conf, data) {
             var defaultConf, chartConf, chart, seriesStyles, colorIndex;
@@ -463,7 +387,9 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                         fontSize: '13px',
                         padding: '2px 5px'
                     },
-                    markerLabelFunction: function (categoryItem, valueItem, itemIndex, series, seriesIndex) {
+                    markerLabelFunction: function (categoryItem, valueItem,
+                                                   itemIndex, series,
+                                                   seriesIndex) {
                         return createTooltip([
                             valueItem.displayName + ': ' + valueItem.value,
                             categoryItem.displayName + ': ' + categoryItem.value
@@ -560,6 +486,7 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             }.bind(this));
         },
         createTotalChart: function createTotalChart(totalTransactions) {
+            /*
             setTimeout(function () {
                 var min, max;
                 min = totalTransactions[0].total;
@@ -575,16 +502,92 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                 this.totalChart.get('axes').values.set('minimum', min - Math.round(min / 10));
                 this.totalChart.get('axes').values.set('maximum', max + Math.round(min / 10));
             }.bind(this), 100);
+            */
+            this.createTotalChartG(totalTransactions);
         },
-        createAllDataChart: function createAllDataChart(trn) {
+        createTotalChartG: function (transactions) {
+            google.load("visualization", "1", {
+                packages: ["corechart"],
+                callback: function () {
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Date');
+                    dataTable.addColumn('number', 'Total');
+                    // dataTable.addColumn({type: 'string', role: 'tooltip'});
+                    transactions.forEach(function (item) {
+                        dataTable.addRow([item.date, item.total]);
+                    });
+                    if (!this.totalChart) {
+                        this.totalChart = new google.visualization.ChartWrapper({
+                            chartType: 'LineChart',
+                            containerId: 'TotalchartG'
+                        });
+                    }
+                    this.totalChart.setDataTable(dataTable);
+                    this.totalChart.draw();
+                }.bind(this)
+            });
+        },
+        createAllDataChart: function createAllDataChart(trn, data) {
+            /*
             setTimeout(function () {
                 this.allDataChart = this.createChart({
                     render: "#Mychart"
                 }, trn);
                 this.addChartControls();
             }.bind(this), 100);
+            */
+            this.createAllDataChartG(trn, data);
+        },
+        createAllDataChartG: function createAllDataChart(trn, data) {
+            var keys = {},
+                output = [];
+
+            trn.forEach(function (item) {
+                Object.keys(item).forEach(function (key) {
+                    if (key !== 'date') {
+                        keys[key] = 1;
+                    }
+                });
+            });
+            keys = Object.keys(keys);
+            google.load("visualization", "1", {
+                packages: ["corechart"],
+                callback: function () {
+                    var dataTable = new google.visualization.DataTable(output),
+                        lasts;
+
+                    lasts = {};
+                    dataTable.addColumn('string', 'date');
+                    keys.forEach(function (key) {
+                        lasts[key] = 0;
+                        dataTable.addColumn('number', key);
+                    });
+                    trn.forEach(function (item) {
+                        var row = [item.date];
+                        keys.forEach(function (key) {
+                            if (item[key]) {
+                                row.push(item[key]);
+                                lasts[key] = item[key];
+                            } else {
+                                row.push(lasts[key]);
+                            }
+                        });
+                        dataTable.addRow(row);
+                    });
+                    if (!this.allDataChart) {
+                        this.allDataChart = new google.visualization.ChartWrapper({
+                            chartType: 'LineChart',
+                            containerId: 'MychartG'
+                        });
+                    }
+                    this.allDataChart.setDataTable(dataTable);
+                    this.allDataChart.draw();
+                }.bind(this)
+            });
         },
         createTransactionsChart: function createTransactionsChart(trn, json) {
+            /*
+            console.log('transactions', trn);
             setTimeout(function () {
                 this.transactionsChart = this.createChart({
                     render: "#Transactions",
@@ -600,6 +603,52 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                     }
                 }, trn);
             }.bind(this), 100)
+            */
+            this.createTransactionsChartG(trn, json);
+        },
+        createTransactionsChartG: function createTransactionsChart(trn, json) {
+            var keys = {};
+            trn.forEach(function (item) {
+                Object.keys(item).forEach(function (key) {
+                    if (key !== 'date') {
+                        keys[key] = 1;
+                    }
+                });
+            });
+            keys = Object.keys(keys);
+            google.load("visualization", "1", {
+                packages: ["corechart"],
+                callback: function () {
+                    var dataTable = new google.visualization.DataTable(),
+                        rex = /^__duplicated_key__\d+__/;
+                    dataTable.addColumn('string', 'date');
+                    keys.forEach(function (key) {
+                        if (rex.test(key)) {
+                            key = key.replace(rex, '');
+                        }
+                        dataTable.addColumn('number', key);
+                    });
+                    trn.forEach(function (item) {
+                        var row = [item.date];
+                        keys.forEach(function (key) {
+                            row.push(item[key]);
+                        });
+                        dataTable.addRow(row);
+                    });
+                    if (!this.transactionsChart) {
+                        this.transactionsChart  = new google.visualization.ChartWrapper({
+                            chartType: 'BarChart',
+                            containerId: 'TransactionsG'
+                        });
+                    }
+                    this.transactionsChart.setDataTable(dataTable);
+                    this.transactionsChart.setOptions({
+                        isStacked: true,
+                        height: trn.length * 25
+                    });
+                    this.transactionsChart.draw();
+                }.bind(this)
+            });
         },
         renderAllTransactions: function (attribute) {
             if (!this.get('allTransactionsRendered')) {
@@ -660,15 +709,15 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
             Y.one('#DataForm').showBlock();
             Y.one('#Controls').empty();
             if (this.allDataChart) {
-                this.allDataChart.destroy();
+                this.allDataChart.clearChart();
                 this.set('allTransactionsRendered', false);
             }
             if (this.transactionsChart) {
-                this.transactionsChart.destroy();
+                this.transactionsChart.clearChart();
                 this.set('lastDaysTransactionsRendered', false);
             }
             if (this.totalChart) {
-                this.totalChart.destroy();
+                this.totalChart.clearChart();
                 this.set('totalChartRendered', false);
             }
         },
@@ -717,13 +766,11 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
                             var json = JSON.parse(o.response);
                             if (json.account) {
                                 this.set('json', json);
-                                processAllTransactions.call(this, function allTransactionsCallback(transactions) {
-                                    /*
-                                    this.getTransactions();
-                                    */
-                                    this.goodData();
-                                    this.onAllResponse(json);
-                                }.bind(this));
+                                processAllTransactions.call(this,
+                                    function allTransactionsCallback(transactions) {
+                                        this.goodData();
+                                        this.onAllResponse(json);
+                                    }.bind(this));
                             } else {
                                 this.badData();
                             }
@@ -737,11 +784,18 @@ YUI.add('FinancistoApp', function FinancistoApp(Y) {
         }
     };
 
-    window.Y = Y;
-
     Y.augment(FinancistoApp, Y.Attribute);
     Y.FinancistoApp = FinancistoApp;
 }, '0.0.2', {
-    requires: ['base', 'charts', 'io', 'node++', 'event', 'tabview', 'console', 'tabview']
+    requires: [
+        'base',
+        // 'charts',
+        'io',
+        'node++',
+        'event',
+        'tabview',
+        'console',
+        'attribute'
+    ]
 });
 
