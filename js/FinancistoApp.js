@@ -565,7 +565,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
                     trn.forEach(function (item) {
                         var row = [item.date];
                         keys.forEach(function (key) {
-                            if (item[key]) {
+                            if (typeof item[key] === 'number') {
                                 row.push(item[key]);
                                 lasts[key] = item[key];
                             } else {
