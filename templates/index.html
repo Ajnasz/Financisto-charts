@@ -5,11 +5,11 @@
 
         <title>Financisto charts</title>
         <script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
-        <script src="/a.js"></script>
+        <script src="/js/a.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssbase/cssbase-min.css">
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/grids-min.css">
-        <link rel="stylesheet" type="text/css" href="/styles.css" />
+        <link rel="stylesheet" type="text/css" href="/css/styles.css" />
     </head>
     <body class="yui3-skin-sam">
         <a href="https://github.com/Ajnasz/Financisto-charts"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
@@ -52,7 +52,9 @@
                     <ul>
                         <li><a href="#TotalTransactions">Total</a></li>
                         <li><a href="#AllTransactions">All Transactions</a></li>
-                        <li><a href="#LastDaysTransactions">Transactions in last few days</a></li>
+                        <!--<li><a href="#LastDaysTransactions">Transactions in last few days</a></li>-->
+                        <li><a href="#WeeklyTransactions">Weekly transactions</a></li>
+                        <li><a href="#MonthlyTransactions">Monthly transactions</a></li>
                     </ul>
                     <div>
                         <div id="TotalTransactions">
@@ -70,13 +72,22 @@
                                 <div id="Controls"></div>
                             </div>
                         </div>
+                        <!--
                         <div id="LastDaysTransactions">
                             <div>
                                 <h2>Transactions in last few days</h3>
                                 <label>Days: <input type="number" min="1" value="31" id="DaySelect" /></label>
-                                <!-- <div id="Transactions" class="chart"></div> -->
                                 <div id="TransactionsG" class="chart"></div>
                             </div>
+                        </div>
+                        -->
+                        <div id="WeeklyTransactions">
+                            <h2>Transactions by weeks</h3>
+                            <div id="WeeklyTransactionsG" class="chart"></div>
+                        </div>
+                        <div id="MonthlyTransactions">
+                            <h2>Transactions by months</h3>
+                            <div id="MonthlyTransactionsG" class="chart"></div>
                         </div>
                     </div>
                 </div>

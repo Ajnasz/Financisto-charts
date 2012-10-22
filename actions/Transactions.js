@@ -41,10 +41,10 @@ function join(aData, bData, on, names) {
                     // var merged = Y.merge(aItem, bItem);
                     var merged = {};
                     Object.keys(names.aNames).forEach(function (key) {
-                        merged[names.aNames[key]] = aItem[key];
+                        merged[names.aNames[key]] = aItem[key] || 'Undef A';
                     });
                     Object.keys(names.bNames).forEach(function (key) {
-                        merged[names.bNames[key]] = bItem[key];
+                        merged[names.bNames[key]] = bItem[key] || 'Undef B';
                     });
                     output.push(merged);
                 }
@@ -99,8 +99,6 @@ Transactions.prototype.executeGet = function (request, requestData) {
     if (query && query.days) {
         days =  query.days;
     }
-
-    require('fs').writeFile('alldata.json', JSON.stringify(allData), 'utf-8');
 
     if (allData) {
         output = join(

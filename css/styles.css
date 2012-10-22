@@ -14,9 +14,11 @@ label {
 textarea, input {
     padding: 2px 5px;
 }
+/*
 .yui3-tab-panel > div {
     padding: 10px;
 }
+*/
 .yui3-skin-sam .yui3-tabview-panel {
     background: #fff;
     border-color: #808080;
@@ -47,7 +49,7 @@ textarea, input {
     border-color: #808080;
 }
 .chart {
-    height: 500px;
+    /* height: 500px; */
     position: relative;
 }
 #TransactionsG {

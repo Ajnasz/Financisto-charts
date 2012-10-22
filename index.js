@@ -33,7 +33,7 @@ var http = require('http'),
     ip = '127.0.0.1',
     port = 16444;
 
-
+Session.maxSize = 1048576;
 
 var yuiConf = {
     modules: {
@@ -81,18 +81,33 @@ function getController(action) {
 var router = new Router();
 router.get('/', 'Static/Index');
 router.head('/', 'Static/Index');
-router.get('/a.js', 'Static/JS');
-router.head('/a.js', 'Static/JS');
-router.get('/console.js', 'Static/JS');
-router.head('/console.js', 'Static/JS');
-router.get('/FinancistoApp.js', 'Static/JS');
-router.head('/FinancistoApp.js', 'Static/JS');
-router.get('/styles.css', 'Static/CSS');
-router.head('/styles.css', 'Static/CSS');
-router.get('/ajndao.js', 'Static/JS');
-router.head('/ajndao.js', 'Static/JS');
-router.get('/dataconverter.js', 'Static/JS');
-router.head('/dataconverter.js', 'Static/JS');
+
+router.get('/js/a.js', 'Static/JS');
+router.head('/js/a.js', 'Static/JS');
+router.get('/js/console.js', 'Static/JS');
+router.head('/js/console.js', 'Static/JS');
+router.get('/js/FinancistoWorker.js', 'Static/JS');
+router.head('/js/FinancistoWorker.js', 'Static/JS');
+router.get('/js/FinancistoApp.js', 'Static/JS');
+router.head('/js/FinancistoApp.js', 'Static/JS');
+router.get('/js/dataTableGenerator.js', 'Static/JS');
+router.head('/js/dataTableGenerator.js', 'Static/JS');
+router.get('/js/ChartCreator.js', 'Static/JS');
+router.head('/js/ChartCreator.js', 'Static/JS');
+router.get('/js/TransactionProcessor.js', 'Static/JS');
+router.head('/js/TransactionProcessor.js', 'Static/JS');
+router.get('/js/node++.js', 'Static/JS');
+router.head('/js/node++.js', 'Static/JS');
+router.get('/js/ajndao.js', 'Static/JS');
+router.head('/js/ajndao.js', 'Static/JS');
+router.get('/js/dataconverter.js', 'Static/JS');
+router.head('/js/dataconverter.js', 'Static/JS');
+router.get('/js/DataStorage.js', 'Static/JS');
+router.head('/js/DataStorage.js', 'Static/JS');
+
+router.get('/css/styles.css', 'Static/CSS');
+router.head('/css/styles.css', 'Static/CSS');
+
 router.get('/data', 'Data/Get');
 router.put('/data', 'Data/Set');
 router.del('/data', 'Data/Del');

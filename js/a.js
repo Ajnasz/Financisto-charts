@@ -25,8 +25,50 @@ THE SOFTWARE.
 // Create a new YUI instance and populate it with the required modules.
 YUI({
     modules: {
+        'FinancistoWorker': {
+            fullpath: '/js/FinancistoWorker.js',
+            requires: [
+                'base',
+                'event',
+                'attribute'
+            ]
+        },
+        'dataTableGenerator': {
+            fullpath: '/js/dataTableGenerator.js',
+            requires: [
+                'base'
+            ]
+        },
+        'TransactionProcessor': {
+            fullpath: '/js/TransactionProcessor.js',
+            requires: [
+                'base',
+                'event',
+                'attribute',
+                'FinancistoWorker'
+            ]
+        },
+        'ChartCreator': {
+            fullpath: '/js/ChartCreator.js',
+            requires: [
+                'base',
+                'event',
+                'attribute',
+                'dataTableGenerator'
+            ]
+        },
+        'DataStorage': {
+            fullpath: '/js/DataStorage.js',
+            requires: [
+                'base',
+                // 'charts',
+                'io',
+                'event',
+                'attribute'
+            ]
+        },
         'FinancistoApp': {
-            fullpath: '/FinancistoApp.js',
+            fullpath: '/js/FinancistoApp.js',
             requires: [
                 'base',
                 // 'charts',
@@ -35,19 +77,23 @@ YUI({
                 'event',
                 'tabview',
                 'console',
-                'attribute'
+                'attribute',
+                'DataStorage',
+                'ChartCreator',
+                'TransactionProcessor'
             ]
         },
         'node++': {
+            fullpath: '/js/node++.js',
             requires: [
                 'node'
             ]
         },
         'ajn:dao': {
-            fullpath: '/ajndao.js'
+            fullpath: '/js/ajndao.js'
         },
         'console': {
-            fullpath: '/console.js'
+            fullpath: '/js/console.js'
         }
     }
 }).use('node', 'FinancistoApp', function (Y) {
@@ -61,5 +107,6 @@ YUI({
             .get('parentNode').setStyle('display', 'block');
     } else {
         var app = new Y.FinancistoApp();
+        window.app = app;
     }
 });

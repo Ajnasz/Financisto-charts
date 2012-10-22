@@ -32,6 +32,9 @@ Data.prototype.executeGet = function () {
     if (data) {
         this.serveJSON(JSON.stringify(JSON.parse(data).tables), 200);
     } else {
+        this.setHeaders([
+            {name: 'Content-Type', value: 'application/json'}
+        ]);
         this.sendResponse({status: 204});
     }
 };

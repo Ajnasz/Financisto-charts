@@ -23,7 +23,9 @@ THE SOFTWARE.
 /*jslint node: true*/
 var util = require('util'),
     url = require('url'),
+    fs = require('fs'),
     Action = require('../libs/Action').Action;
+
 function Static() {}
 util.inherits(Static, Action);
 Static.prototype.serveStatic = function (request, data, type, status) {
@@ -46,6 +48,7 @@ Static.prototype.serveStatic = function (request, data, type, status) {
         contentType = 'text/css';
         break;
     case 'json':
+        // this.setExpireHeaderHour(1);
         contentType = 'application/json';
         break;
     }
@@ -68,24 +71,16 @@ Static.prototype.executeJS = function (request) {
         pathName = requestUrl.pathname,
         fileName;
 
-    if (pathName === '/a.js') {
-        fileName = 'a.js';
-    } else if (pathName === '/console.js') {
-        fileName = 'console.js';
-    } else if (pathName === '/fw.js') {
-        fileName = 'fw.js';
-    } else if (pathName === '/ajndao.js') {
-        fileName = 'ajndao.js';
-    } else if (pathName === '/FinancistoApp.js') {
-        fileName = 'FinancistoApp.js';
-    } else if (pathName === '/dataconverter.js') {
-        fileName = 'dataconverter.js';
-    }
+    if (pathName.indexOf('/js/') === 0) {
+        fileName = pathName.substr(4);
 
-    this.readJSFile(fileName, function (data) {
-        var dataStr = data.toString('utf8');
-        this.serveStatic(request, dataStr, 'js');
-    }.bind(this));
+        this.readJSFile(fileName, function (data) {
+            var dataStr = data.toString('utf8');
+            this.serveStatic(request, dataStr, 'js');
+        }.bind(this));
+    } else {
+        this.notFound();
+    }
 };
 
 Static.prototype.executeCSS = function (request) {
@@ -93,14 +88,16 @@ Static.prototype.executeCSS = function (request) {
         pathName = requestUrl.pathname,
         fileName;
 
-    if (pathName === '/styles.css') {
-        fileName = 'styles.css';
-    }
+    if (pathName.indexOf('/css/') === 0) {
+        fileName = pathName.substr(5);
 
-    this.readCSSFile(fileName, function (data) {
-        var dataStr = data.toString('utf8');
-        this.serveStatic(request, dataStr, 'css');
-    }.bind(this));
+        this.readCSSFile(fileName, function (data) {
+            var dataStr = data.toString('utf8');
+            this.serveStatic(request, dataStr, 'css');
+        }.bind(this));
+    } else {
+        this.notFound();
+    }
 };
 
 exports.Static = Static;

@@ -134,13 +134,15 @@ function processConvertedData(data) {
         'transactions',
         'payee'
     ].forEach(function (key) {
-        var outputKey = key;
+        var outputKey;
         if (key === 'account') {
             outputKey = 'accounts';
         } else if (key === 'project') {
             outputKey = 'projects';
         } else if (key === 'currency') {
             outputKey = 'currencies';
+        } else {
+            outputKey = key;
         }
         output[outputKey] = {};
         if (data[key]) {
@@ -151,6 +153,69 @@ function processConvertedData(data) {
     });
     return output;
 }
+
+function getWeekNumber(ts) {
+    var date = new Date(),
+        dateonejan = new Date(),
+        onejan;
+
+    date.setTime(ts);
+    dateonejan.setTime(ts);
+
+    onejan = new Date(dateonejan.getFullYear(), 0, 1);
+    return Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+function getMonthNumber(ts) {
+    var date = new Date();
+    date.setTime(ts);
+    return date.getFullYear() + '-' + (date.getMonth() + 1);
+}
+function getWeeklyTransactions(data) {
+    var weeklyGroups;
+    weeklyGroups = [];
+    data.transactions.forEach(function (transaction) {
+        var group, amount, weekNumber;
+
+        weekNumber = getWeekNumber(transaction.datetime);
+
+        if (!weeklyGroups[weekNumber]) {
+            weeklyGroups[weekNumber] = [];
+        }
+
+        amount = parseInt(transaction.from_amount, 10) + parseInt(transaction.to_amount, 10);
+        weeklyGroups[weekNumber].push(amount / 100);
+    });
+    return weeklyGroups.map(function (group, index) {
+        return [index, group.reduce(function (prev, current) {
+            return current + prev;
+        }, 0)];
+    });
+}
+
+function getMonthlyTransactions(data) {
+    var monthlyGroups = {};
+
+    data.transactions.forEach(function (transaction) {
+        var group, amount, monthNumber;
+
+        monthNumber = getMonthNumber(transaction.datetime);
+
+        if (!monthlyGroups[monthNumber]) {
+            monthlyGroups[monthNumber] = [];
+        }
+
+        amount = parseInt(transaction.from_amount, 10) + parseInt(transaction.to_amount, 10);
+        monthlyGroups[monthNumber].push(amount / 100);
+    });
+
+    return Object.keys(monthlyGroups).map(function (group, index) {
+        var items = monthlyGroups[group];
+        return [group, items.reduce(function (prev, current) {
+            return current + prev;
+        }, 0)];
+    });
+}
+
 var self = self || this;
 
 self.addEventListener('message', function (event) {
@@ -166,7 +231,17 @@ self.addEventListener('message', function (event) {
         case 'converteddata':
             output = processConvertedData(event.data.json);
             break;
+        case 'weeklypays':
+            output = getWeeklyTransactions(event.data.json);
+            break;
+        case 'monthlypays':
+            output = getMonthlyTransactions(event.data.json);
+            break;
         }
     }
-    self.postMessage(output);
+
+    self.postMessage({
+        type: event.data.type,
+        data: output
+    });
 });
