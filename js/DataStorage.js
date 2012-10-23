@@ -69,20 +69,20 @@ YUI.add('DataStorage', function (Y) {
                 method: 'DELETE',
                 on: {
                     success: function resetSuccessListener() {
-                        this.set('json', null);
-                        this.set('transactions', null);
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'success'
                         });
+                        this.set('json', null);
+                        this.set('transactions', null);
                         this.fire('goodData');
                     }.bind(this),
                     failure: function resetFailureListener(id, o) {
-                        this.fire('badData', {response: o});
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'failure'
                         });
+                        this.fire('badData', {response: o});
                     }.bind(this)
                 }
             });
@@ -100,19 +100,19 @@ YUI.add('DataStorage', function (Y) {
                 },
                 on: {
                     success: function (id, o) {
-                        this.fire('dataSet');
-                        this.fire('goodData');
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'success'
                         });
+                        this.fire('dataSet');
+                        this.fire('goodData');
                     }.bind(this),
                     failure: function (id, o) {
-                        this.fire('badData', {response: o});
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'failure'
                         });
+                        this.fire('badData', {response: o});
                     }.bind(this)
                 }
             });
@@ -128,6 +128,10 @@ YUI.add('DataStorage', function (Y) {
                 },
                 'on': {
                     'success': function getAllSuccessListener(id, o, args) {
+                        this.fire('completeRequest', {
+                            requestName: requestName,
+                            resultType: 'success'
+                        });
                         if (o.status === 200) {
                             var json = JSON.parse(o.response);
                             if (json.account) {
@@ -138,17 +142,13 @@ YUI.add('DataStorage', function (Y) {
                             this.fire('badData', {response: o});
                             // this.badData('Please upload a backup file');
                         }
-                        this.fire('completeRequest', {
-                            requestName: requestName,
-                            resultType: 'success'
-                        });
                     }.bind(this),
                     'failure': function (id, o) {
-                        this.fire('badData', {response: o});
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'failure'
                         });
+                        this.fire('badData', {response: o});
                     }.bind(this)
                 }
             });
@@ -161,21 +161,21 @@ YUI.add('DataStorage', function (Y) {
             Y.io('transactions.json?days=' + days, {
                 'on': {
                     'success': function (id, o) {
-                        this.set('transactions.' + days, {
-                            days: days,
-                            data: JSON.parse(o.response)
-                        });
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'success'
                         });
+                        this.set('transactions.' + days, {
+                            days: days,
+                            data: JSON.parse(o.response)
+                        });
                     }.bind(this),
                     'failure': function (id, o) {
-                        this.fire('badData', {response: o});
                         this.fire('completeRequest', {
                             requestName: requestName,
                             resultType: 'failure'
                         });
+                        this.fire('badData', {response: o});
                     }.bind(this)
                 }
             });

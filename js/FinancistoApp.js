@@ -133,12 +133,12 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
             }.bind(this));
 
             dataStorage.on('sendRequest', function (event) {
-                if (['setData', 'getJSON'].indexOf('setData') > -1) {
+                if (['setData', 'getJSON'].indexOf(event.requestName) > -1) {
                     this.load('#DataPoster');
                 }
             }.bind(this));
             dataStorage.on('completeRequest', function (event) {
-                if (['setData', 'getJSON'].indexOf('setData') > -1) {
+                if (['setData', 'getJSON'].indexOf(event.requestName) > -1) {
                     this.noLoad('#DataPoster');
                 }
             }.bind(this));
