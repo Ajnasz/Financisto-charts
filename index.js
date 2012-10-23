@@ -122,7 +122,11 @@ function processRequest(req, res) {
 
     console.log('%s\t%s\t%s\t%s\t%s', (new Date()).toISOString(), req.method, req.url,
                 req.headers['user-agent'], req.headers.referer || '');
-    session = new Session(req, res);
+    session = new Session(req, res, {
+        cookieProps: {
+            path: '/'
+        }
+    });
 
     req.setEncoding('utf8');
 
