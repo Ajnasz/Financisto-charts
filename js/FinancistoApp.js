@@ -224,6 +224,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
         showCharts: function showCharts(e) {
             Y.one('#Charts').showBlock();
             Y.one('#DataForm').hide();
+            Y.one('#Reset').show();
             if (this.chartTabView.get('rendered')) {
                 if (this.chartTabView.item(0).get('selected')) {
                     this.chartTabView.item(0).set('selected', 0);
@@ -240,6 +241,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
             Y.one('#Charts').hide();
             Y.one('#DataForm').showBlock();
             Y.one('#Controls').empty();
+            Y.one('#Reset').hide();
         },
         badData: function badData(msg) {
             this.hideCharts();

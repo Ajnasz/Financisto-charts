@@ -7,13 +7,19 @@
         <script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
         <script src="/js/a.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+        <!-- STYLESHEETS -->
+        <link rel="stylesheet"
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssbase/cssbase-min.css">
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/grids-min.css">
         <link rel="stylesheet" type="text/css" href="/css/styles.css" />
     </head>
     <body class="yui3-skin-sam">
         <a href="https://github.com/Ajnasz/Financisto-charts"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-        <h1>Financisto charts</h1>
+        <div id="Head">
+            <button type="button" class="reset button" id="Reset"><span>Reset</span></button>
+            <h1>Financisto charts</h1>
+        </div>
         <div id="Main">
             <div class="error">
                 <p id="Error"></p>
@@ -32,7 +38,7 @@
                             <div id="DownloadFromURL">
                                 <div>
                                     <label for="UrlField">URL:</label><br />
-                                    <input type="url" name="url" id="UrlField" /><br />
+                                    <input type="url" name="url" id="UrlField" />
                                 </div>
                             </div>
                             <div id="CopyData">
@@ -47,7 +53,6 @@
                 </form>
             </div>
             <div id="Charts">
-                <button type="button" class="reset button orange"><span>Reset</span></button>
                 <div id="ChartTabs">
                     <ul>
                         <li><a href="#TotalTransactions">Total</a></li>
