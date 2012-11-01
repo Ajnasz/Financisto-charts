@@ -224,7 +224,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
         showCharts: function showCharts(e) {
             Y.one('#Charts').showBlock();
             Y.one('#DataForm').hide();
-            Y.one('#Reset').show();
+            Y.one('#Reset').showBlock();
             if (this.chartTabView.get('rendered')) {
                 if (this.chartTabView.item(0).get('selected')) {
                     this.chartTabView.item(0).set('selected', 0);

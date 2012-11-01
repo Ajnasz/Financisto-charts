@@ -13,7 +13,7 @@ textarea {
     height: 100px;
 }
 label {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
 }
 textarea, input {
@@ -64,6 +64,10 @@ a:hover {
     margin-left: 0px;
 	border-width: 0 0px 4px 0px;
 	font-size: 1em;
+
+    -webkit-transition: color 0.2s ease 0s, border-color 0.5s ease;
+       -moz-transition: color 0.2s ease 0s, border-color 0.5s ease;
+            transition: color 0.2s ease 0s, border-color 0.5s ease;
 }
 .yui3-skin-sam .yui3-tab-label:after {
     content: ' ';
@@ -92,12 +96,6 @@ a:hover {
     margin-top: 1px;
     padding-bottom: 4px;
 	border-color: #0099CC;
-	
-
-}
-.yui3-skin-sam .yui3-tab-selected {
-    border-bottom: 3px solid;
-    margin-bottom: -1px;
 }
 .yui3-skin-sam .yui3-tab  {
 	margin:0;
@@ -183,6 +181,9 @@ a:hover {
 }
 #Charts,
 #Main {
+    padding-bottom: 20px;
+}
+#Charts, #Main, #Reset {
     display: none;
 }
 .error {
