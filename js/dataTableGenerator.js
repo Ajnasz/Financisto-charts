@@ -94,7 +94,7 @@ YUI.add('dataTableGenerator', function (Y) {
                 callback: function () {
                     var dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('string', 'Month');
-                    dataTable.addColumn('number', 'Money spent');
+                    dataTable.addColumn('number', 'Money saved');
                     // dataTable.addColumn({type: 'string', role: 'tooltip'});
                     transactions.forEach(function (item) {
                         dataTable.addRow([formatMonth(item[0]), item[1]]);
@@ -109,7 +109,7 @@ YUI.add('dataTableGenerator', function (Y) {
                 callback: function () {
                     var dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('number', 'Week');
-                    dataTable.addColumn('number', 'Money spent');
+                    dataTable.addColumn('number', 'Money saved');
                     // dataTable.addColumn({type: 'string', role: 'tooltip'});
                     transactions.forEach(function (item) {
                         dataTable.addRow([item[0], item[1]]);
