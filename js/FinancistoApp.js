@@ -92,6 +92,8 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
         },
 
         createTabView: function () {
+            var onTabSelect = this.onTabSelect.bind(this);
+
             this.tabView = new Y.TabView({
                 srcNode: '#Tabs'
             });
@@ -100,10 +102,14 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
                 srcNode: '#ChartTabs'
             });
             // select the currently selected tab on tabview render
-            this.chartTabView.after('render', this.onTabSelect.bind(this));
+            this.chartTabView.after('render', onTabSelect);
             // select the currently selected tab on selection change
-            this.chartTabView.after('selectionChange', this.onTabSelect.bind(this));
-            // TODO remove, debug
+            this.chartTabView.after('selectionChange', onTabSelect);
+
+            this.chartTabView.after('render', function () {
+                this.setPageTitle();
+                this.chartTabView.after('selectionChange', this.setPageTitle.bind(this));
+            }.bind(this));
         },
 
         setupDataStorage: function () {
@@ -114,6 +120,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
                 if (!json) {
                     this.hideCharts();
                     this.cleanup();
+                    this.setPageTitle();
                 }
                 this.set('json', json);
             }.bind(this));
@@ -162,30 +169,70 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
 
         },
 
-        onTabSelect: function onTabSelect(tabId) {
-
-            var selection;
+        getSelectedChartTabId: function () {
+            var isChartTabRendered = this.chartTabView.get('rendered'),
+                selection = null,
+                selectionId = null;
             // render chart only if the tabview is rendered
-            if (this.chartTabView.get('rendered')) {
+            if (isChartTabRendered) {
                 selection = this.chartTabView.get('selection');
-                if (!selection) {
-                    return;
+                if (selection) {
+                    selectionId = selection.get('panelNode').get('id');
                 }
+            }
+            return selectionId;
+        },
 
-                switch (selection.get('panelNode').get('id')) {
-                case 'TotalTransactions':
-                    this.renderTotalTransactions();
-                    break;
-                case 'AllTransactions':
-                    this.renderAllTransactions();
-                    break;
-                case 'WeeklyTransactions':
-                    this.renderWeeklyTransactions();
-                    break;
-                case 'MonthlyTransactions':
-                    this.renderMonthlyTransactions();
-                    break;
+        isChartHidden: function () {
+            return Y.one('#Charts').getStyle('display') === 'none';
+        },
+
+        setPageTitle: function () {
+            var selectionId, titleElem, title;
+
+            titleElem = Y.one('title');
+            title = titleElem.get('text').split('-')[0].trim();
+
+            if (!this.isChartHidden()) {
+                selectionId = this.getSelectedChartTabId();
+
+                if (selectionId) {
+                    switch (selectionId) {
+                    case 'TotalTransactions':
+                        title += ' - Transaction history';
+                        break;
+                    case 'AllTransactions':
+                        title += ' - Transactions by account';
+                        break;
+                    case 'WeeklyTransactions':
+                        title += ' - Money saved by week';
+                        break;
+                    case 'MonthlyTransactions':
+                        title += ' - Money saved by month';
+                        break;
+                    }
+
                 }
+            }
+            titleElem.set('text', title);
+        },
+
+        onTabSelect: function onTabSelect(tabId) {
+            var selectionId = this.getSelectedChartTabId();
+            // render chart only if the tabview is rendered
+            switch (selectionId) {
+            case 'TotalTransactions':
+                this.renderTotalTransactions();
+                break;
+            case 'AllTransactions':
+                this.renderAllTransactions();
+                break;
+            case 'WeeklyTransactions':
+                this.renderWeeklyTransactions();
+                break;
+            case 'MonthlyTransactions':
+                this.renderMonthlyTransactions();
+                break;
             }
         },
 
@@ -242,7 +289,7 @@ YUI.add('FinancistoApp', function FinancistoYUIApp(Y) {
                 }
                 this.chartTabView.item(0).set('selected', 1);
             } else {
-                this.chartTabView.on('rendered', function () {
+                this.chartTabView.after('rendered', function () {
                     this.chartTabView.item(0).set('selected', 1);
                 }.bind(this));
                 this.chartTabView.render();
